@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51fcb3cb7e2a5f24d84d8061e64ea368, type: 3}
+  m_Name: Shooting Star
+  m_EditorClassIdentifier: 
+  friendly: 0
+  requiresTarget: 1
+  free: 0
+  baseDMG: 5
+  baseHP: 0
+  baseACC: 100
+  costAP: 2
+  range: 3
+  knockback: 0
+  selfMovement: 0
+  totalHits: 5
+  displayName: Shooting Star
+  description: Attack the enemy 5 times. Each attack does 20% of the amount of a
+    basic attack.
+  shape:
+  - {x: 0, y: 0}
+  targetModifiers: []
+  selfModifiers: []
+  targetEffect: {fileID: 4784453221001766085, guid: cde2a6e95f2ded54fa422f3ad732b0d0, type: 3}
+  selfEffect: {fileID: 5715929136899716100, guid: 50cb25120d841ce468ec3a3fc6ced5ef, type: 3}

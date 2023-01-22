@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51fcb3cb7e2a5f24d84d8061e64ea368, type: 3}
+  m_Name: Persistance
+  m_EditorClassIdentifier: 
+  friendly: 0
+  requiresTarget: 1
+  free: 0
+  baseDMG: 0
+  baseHP: 0
+  baseACC: 0
+  costAP: 0
+  range: 1
+  knockback: 0
+  selfMovement: 0
+  totalHits: 1
+  displayName: Persistance
+  description: Attack the enemy. The less HP the user has, the more damage is dealt.
+  shape:
+  - {x: 0, y: 0}
+  targetModifiers: []
+  selfModifiers: []
+  targetEffect: {fileID: 56185537105012672, guid: e06b8c9f714e8e14dba99eb1a3233ffb, type: 3}
+  selfEffect: {fileID: 0}

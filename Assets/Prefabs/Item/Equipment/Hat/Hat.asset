@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42f44bf7e16757044a7f9aac0589fa2f, type: 3}
+  m_Name: Hat
+  m_EditorClassIdentifier: 
+  ItemName: Marksman's Cap
+  Icon: {fileID: 0}
+  Type: Hat
+  Stats: DEX +8
+  Description: 
+  modifiers:
+  - type: 5
+    op: 0
+    duration: -1
+    value: 8
+    chance: 1
+    id: 
+    statusIcon: {fileID: 0}
+  EquipmentType: 2

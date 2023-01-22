@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ec5507ae89827f42a4321f8662d253f, type: 3}
+  m_Name: Acc3
+  m_EditorClassIdentifier: 
+  ItemName: 
+  Icon: {fileID: 21300000, guid: c7383e586039628429f2cbcc59d997ab, type: 3}
+  Type: 
+  Stats: 
+  HpBonus: 0
+  StrBonus: 0
+  DefBonus: 0
+  SpdBonus: 0
+  DexBonus: 0
+  LckBonus: 0
+  MvBonus: 0
+  ApBonus: 0
+  MoraleBonus: 0
+  DurBonus: 0
+  HpMod: 0
+  StrMod: 0
+  DefMod: 0
+  SpdMod: 0
+  DexMod: 0
+  LckMod: 0
+  MvMod: 0
+  ApMod: 0
+  MoraleMod: 0
+  DurMod: 0
+  EquipmentType: 6

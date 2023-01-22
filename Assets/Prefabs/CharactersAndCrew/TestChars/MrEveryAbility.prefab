@@ -1,0 +1,223 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2766139005915823532
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394416989692088311, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5537537504233135668, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: m_Name
+      value: MrEveryAbility
+      objectReference: {fileID: 0}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: classname
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.size
+      value: 39
+      objectReference: {fileID: 0}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 493886f2b3b43e44ea5d55fc0998e429, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 8eafeee990a5dd5418f1c540af83baed, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 1f7cb3cf19b1c0c4099a8f5cb96d3a6b, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[3]
+      value: 
+      objectReference: {fileID: 11400000, guid: 51c646b6c8a8d9947a6053b30d46c253, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[4]
+      value: 
+      objectReference: {fileID: 11400000, guid: 1f3d02de18d42bc478ce3022ea808d4d, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[5]
+      value: 
+      objectReference: {fileID: 11400000, guid: ec9ffa96132f51943a1baa0d42a441d0, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[6]
+      value: 
+      objectReference: {fileID: 11400000, guid: 9648dc0985c7c694abfef8b270b1cfe9, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[7]
+      value: 
+      objectReference: {fileID: 11400000, guid: f346cc0c7570f514cbea0832fb50081a, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[8]
+      value: 
+      objectReference: {fileID: 11400000, guid: 95725668f43e6fc4ab860003878506d0, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[9]
+      value: 
+      objectReference: {fileID: 11400000, guid: 9edc0e81138810a45a1e1d7ead08d093, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[10]
+      value: 
+      objectReference: {fileID: 11400000, guid: 2f0d9fc0509c07a49af97d04fb891dec, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[11]
+      value: 
+      objectReference: {fileID: 11400000, guid: 22d68fec710ae4844b65c59185255492, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[12]
+      value: 
+      objectReference: {fileID: 11400000, guid: b8efc36a33e9a4d44b035f32c327f409, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[13]
+      value: 
+      objectReference: {fileID: 11400000, guid: 4fc268394394b744c99244a2aeecb887, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[14]
+      value: 
+      objectReference: {fileID: 11400000, guid: 45b05c7045dce934c8aa5ae27bb5aa15, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[15]
+      value: 
+      objectReference: {fileID: 11400000, guid: 4736e8cb7e914f74ea9e22ffb7c86d20, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[16]
+      value: 
+      objectReference: {fileID: 11400000, guid: f96d2a999e2bc3d45b47718552073f62, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[17]
+      value: 
+      objectReference: {fileID: 11400000, guid: 07722a2b48359b44aaa9d30386ff8bd9, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[18]
+      value: 
+      objectReference: {fileID: 11400000, guid: a18708986ca0f9d4891e2799e73ff767, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[19]
+      value: 
+      objectReference: {fileID: 11400000, guid: 91629a762d5e04c4b98de2cf77f8f1e9, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[20]
+      value: 
+      objectReference: {fileID: 11400000, guid: dac69d1c3688d434491a6e50fcfe8d20, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[21]
+      value: 
+      objectReference: {fileID: 11400000, guid: 595dc3b54765dcd438942d4f718cf379, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[22]
+      value: 
+      objectReference: {fileID: 11400000, guid: c4269e1071523f1408728e817c6830f3, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[23]
+      value: 
+      objectReference: {fileID: 11400000, guid: 89eecb4f003547c48ba574cde6a6b3c9, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[24]
+      value: 
+      objectReference: {fileID: 11400000, guid: 346e1b2db8f25b2408af263f65d9a251, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[25]
+      value: 
+      objectReference: {fileID: 11400000, guid: 4bb0b851b226c9149a02ba8171d00029, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[26]
+      value: 
+      objectReference: {fileID: 11400000, guid: 7843dd702ca6e124487db21dc5f1a18d, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[27]
+      value: 
+      objectReference: {fileID: 11400000, guid: 39a9c5cfd6612d64cbed2c0d58ad2dc9, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[28]
+      value: 
+      objectReference: {fileID: 11400000, guid: 59bb94061510c1445be76aaeadcc917d, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[29]
+      value: 
+      objectReference: {fileID: 11400000, guid: d967baffc9732f4448cb5f368929fba1, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[30]
+      value: 
+      objectReference: {fileID: 11400000, guid: f57eee50d09fbf04fbc933430c0058bd, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[31]
+      value: 
+      objectReference: {fileID: 11400000, guid: d0b8931bd68593740b7dc4316aad75c9, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[32]
+      value: 
+      objectReference: {fileID: 11400000, guid: af8f09b3a6a2c344f9f9ac0c26bcf93b, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[33]
+      value: 
+      objectReference: {fileID: 11400000, guid: 8d80614a2ea6c124990498329e0d6150, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[34]
+      value: 
+      objectReference: {fileID: 11400000, guid: 226e51f83562270488a13d77483e8d75, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[35]
+      value: 
+      objectReference: {fileID: 11400000, guid: 2e2e02a4a77c5ea4b8229d30acc8666f, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[36]
+      value: 
+      objectReference: {fileID: 11400000, guid: 032be9fb5059dd444b1fdf5a058deae3, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[37]
+      value: 
+      objectReference: {fileID: 11400000, guid: 35fe919e0cdd09b449a632a46246136f, type: 2}
+    - target: {fileID: 6886658739876458237, guid: 35e9b644f5a473148bedf512f2340242, type: 3}
+      propertyPath: abilities.Array.data[38]
+      value: 
+      objectReference: {fileID: 11400000, guid: 5ae80ede2b880c440b59f5641075ed84, type: 2}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 35e9b644f5a473148bedf512f2340242, type: 3}

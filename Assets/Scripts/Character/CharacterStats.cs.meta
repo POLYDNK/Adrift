@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3a50fdbd8c5f86b46b6a74ac706fc930
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - basicAttack: {instanceID: 0}
+  - comboAttack: {instanceID: 0}
+  - healthBar: {instanceID: 0}
+  - canvas: {instanceID: 0}
+  - crew: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

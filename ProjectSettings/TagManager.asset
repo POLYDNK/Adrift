@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Tile
+  - Ship
+  - Ocean
+  - Cannon
+  - Character
+  - Healthbar
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Effects
+  - Water
+  - UI
+  - Grid
+  - Sails
+  - Helm
+  - Deck
+  - Cabin
+  - Invisible
+  - Battle Coins
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: New Layer 1
+    uniqueID: 777220347
+    locked: 0

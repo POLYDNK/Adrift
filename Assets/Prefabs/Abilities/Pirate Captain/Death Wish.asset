@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51fcb3cb7e2a5f24d84d8061e64ea368, type: 3}
+  m_Name: Death Wish
+  m_EditorClassIdentifier: 
+  friendly: 0
+  requiresTarget: 1
+  free: 0
+  baseDMG: 150
+  baseHP: 0
+  baseACC: 60
+  costAP: 3
+  range: 1
+  knockback: 0
+  selfMovement: 0
+  totalHits: 1
+  displayName: Death Wish
+  description: Attack the enemy. If the enemy dies,  +1 AP.
+  shape:
+  - {x: 0, y: 0}
+  targetModifiers: []
+  selfModifiers: []
+  targetEffect: {fileID: 4800071643016473665, guid: f411c7e228ca30d47a781c1ed89b8323, type: 3}
+  selfEffect: {fileID: 0}

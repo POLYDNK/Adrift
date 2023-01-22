@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56b71694a57c3a64a8ebaf74359031cf, type: 3}
+  m_Name: Scimitar
+  m_EditorClassIdentifier: 
+  ItemName: Basic Scimitar
+  Icon: {fileID: 0}
+  Type: Scimitar
+  Stats: 'MGT: 10'
+  Description: 
+  modifiers: []
+  EquipmentType: 0
+  Durability: 0
+  isBroken: 0
+  speedSlash: 0
+  strongSiphon: 0
+  deadlyPierce: 0
+  safeSwap: 0
+  strongSoul: 0
+  lastStand: 0
+  shiningStar: 0
+  betterHeal: 0
+  certainty: 0
+  earlyGambit: 0
+  lateGambit: 0
+  MGT: 10
+  DurabilityMAX: 30
+  abilities:
+  - {fileID: 11400000, guid: 7843dd702ca6e124487db21dc5f1a18d, type: 2}
+  model: {fileID: 0}
+  type: 1
