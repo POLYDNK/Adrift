@@ -31,27 +31,28 @@ public class EnemyAIController : MonoBehaviour
         // Perform move
         currentGrid.MoveTowardsTile(myCharacter.gridPosition,
                                     targetTile.GetComponent<TileScript>().position,
-                                    false, myCharacter.MV);
+                                    false, myCharacter.MV.baseValue);
 
         // Return
         yield break;
     }
 
-    TileScript getBestTile(int searchRange)
+    GameObject getBestTile(int searchRange)
     {
         int highScore = int.MinValue;
-        TileScript bestTile = null;
+        GameObject bestTile = null;
 
-        tilesInRange = grid.GetAllPathsFromTile(tile, searchRange);
+        GameObject myTile = currentGrid.GetTileAtPos(myCharacter.gridPosition);
+        tilesInRange = currentGrid.GetAllPathsFromTile(myTile, searchRange);
         tilesToSearch = tilesInRange.GetAllTiles();
 
-        foreach (GameObject tile tilesToSearch)
+        foreach (GameObject tile in tilesToSearch)
         {
             // Get tile range from tile
             int tRange = tile.GetComponent<TileScript>().pathRef.tileRange;
 
             // See whether current tile is within movement range
-            bool inRange = tRange > myCharacter.MV;
+            bool inRange = (tRange > myCharacter.MV.baseValue);
 
             // Calculate the heuristic value of the current tile
             int newScore = calculateHeuristicValue(tile, currentGrid, inRange);
@@ -64,7 +65,7 @@ public class EnemyAIController : MonoBehaviour
             }
         }
 
-        Debug.Log("getBestTile: found that the tile " + bestTile.position.ToString() + " is best");
+        Debug.Log("getBestTile: found that the tile " + bestTile.GetComponent<TileScript>().position.ToString() + " is best");
 
         return bestTile;
     }
