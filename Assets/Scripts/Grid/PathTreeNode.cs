@@ -19,6 +19,9 @@ public class PathTreeNode
     // Tile range
     public int tileRange;
 
+    // Self and child tiles as a list
+    private List<GameObject> allTiles = null;
+
     // Constructors
     public PathTreeNode() {}
     public PathTreeNode(PathTreeNode p, GameObject t, int range)
@@ -92,7 +95,27 @@ public class PathTreeNode
     // Get all tiles below this node, including this one, as a list
     public List<GameObject> GetAllTiles()
     {
-        
+        // Create a new list
+        allTiles = new List<GameObject>();
+
+        // Call a helper function to populate the list
+        PathTreePreOrder(this);
+
+        // Return the populated list
+        return allTiles;
+    }
+
+    // Helper recursive function to populate the all tiles list
+    private void PathTreePreOrder(PathTreeNode currNode)
+    {
+        // Put the tile object of the current node onto the list
+        allTiles.Add(currNode.myTile);
+
+        // Visit the Up, Down, Left, and Right nodes if able
+        if (currNode.up != null)    { PathTreePreOrder(currNode.up);    }
+        if (currNode.down != null)  { PathTreePreOrder(currNode.down);  }
+        if (currNode.left != null)  { PathTreePreOrder(currNode.left);  }
+        if (currNode.right != null) { PathTreePreOrder(currNode.right); }
     }
 
     // Puts a path of nodes, to the root, onto a stack
