@@ -89,6 +89,12 @@ public class PathTreeNode
         return path;
     }
 
+    // Get all tiles below this node, including this one, as a list
+    public List<GameObject> GetAllTiles()
+    {
+        
+    }
+
     // Puts a path of nodes, to the root, onto a stack
     public void PathToRootOnStack(Stack<PathTreeNode> stack)
     {

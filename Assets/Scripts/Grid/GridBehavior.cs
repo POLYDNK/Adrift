@@ -660,10 +660,10 @@ public class GridBehavior : MonoBehaviour
         root.tileRange = range;
 
         // Character should always be here, but just in case
-        if(!startTile.hasCharacter) {
-            Debug.Log("Error: cannot retrieve paths from tile since its character is null.");
-            return root;
-        }
+        //if(!startTile.hasCharacter) {
+        //    Debug.Log("Error: cannot retrieve paths from tile since its character is null.");
+        //    return root;
+        //}
 
         bool isPlayer = startTile.characterOn.GetComponent<CharacterStats>().isPlayer();
 
