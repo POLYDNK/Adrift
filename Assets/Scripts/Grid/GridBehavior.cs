@@ -665,7 +665,13 @@ public class GridBehavior : MonoBehaviour
         //    return root;
         //}
 
-        bool isPlayer = startTile.characterOn.GetComponent<CharacterStats>().isPlayer();
+        bool isPlayer = false;
+
+        if (startTile.characterOn != null)
+        {
+            CharacterStats tileChar = startTile.characterOn.GetComponent<CharacterStats>();
+            isPlayer = tileChar.isPlayer();
+        }
 
         // Temp vars
         PathTreeNode tempNode;

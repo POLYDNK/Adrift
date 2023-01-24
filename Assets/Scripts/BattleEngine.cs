@@ -128,13 +128,6 @@ public class BattleEngine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Ability to quit game on esc
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Debug.Log("Exiting Adrift..."); //For testing purposes, text shows in log
-            Application.Quit(); //exits and quits the game application
-        }
-
         // Keyboard control
         if (Input.GetKeyDown(KeyCode.Alpha1)) { selectAction(); }
         if (Input.GetKeyDown(KeyCode.Alpha2)) { selectMove(); }
@@ -1192,9 +1185,10 @@ public class BattleEngine : MonoBehaviour
 
     public void doAITurn() 
     {
-        //Debug.Log("AI: AI Turn began");
+        Debug.Log("doAITurn: AI Turn began");
 
-        StartCoroutine(aiTurnWaiter());
+        //StartCoroutine(aiTurnWaiter());
+        StartCoroutine(activeUnit.GetComponent<EnemyAIController>().performTurn(2.0f));
     }
 
     IEnumerator aiTurnWaiter()

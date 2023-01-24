@@ -11,30 +11,57 @@ public class EnemyAIController : MonoBehaviour
 {
     // Component References
     [SerializeField] public CharacterStats myCharacter;
+    [SerializeField] public BattleEngine battleScript = null;
     [SerializeField] public FollowPath movePath;
 
     // Private Vars
     private GridBehavior currentGrid;
     private PathTreeNode tilesInRange;
     private List<GameObject> tilesToSearch;
+    private List<GameObject> validTargets;
+    private bool hasMoved;
 
-    void performTurn()
+    public IEnumerator performTurn(float endTime)
     {
+        hasMoved = false;
+        currentGrid = myCharacter.myGrid.GetComponent<GridBehavior>();
 
+        Debug.Log("performTurn: moving to best tile");
+        StartCoroutine(moveToBestTile(2.0f));
+
+        if (battleScript == null)
+        {
+            battleScript = GameObject.Find("BattleEngine").GetComponent<BattleEngine>();;
+        }
+
+        battleScript.endTurn();
+
+        // Return after waiting
+        yield return new WaitForSecondsRealtime(endTime);
     }
 
-    IEnumerator moveToTile(TileScript tile)
+    IEnumerator moveToBestTile(float moveTime)
     {
+        // Reset valid targets
+        validTargets = new List<GameObject>();
+
         // Search surrounding tiles for the best tile to move to
-        GameObject targetTile = getBestTile(10);
+        GameObject targetTile = getBestTile(6);
 
         // Perform move
-        currentGrid.MoveTowardsTile(myCharacter.gridPosition,
-                                    targetTile.GetComponent<TileScript>().position,
-                                    false, myCharacter.MV.baseValue);
+        Vector2Int newPosition = targetTile.GetComponent<TileScript>().position;
 
-        // Return
-        yield break;
+        if (myCharacter.gridPosition != newPosition)
+        {
+            currentGrid.MoveTowardsTile(myCharacter.gridPosition, newPosition, 
+                                        false, myCharacter.MV.baseValue);
+            hasMoved = true;
+        }
+
+        Debug.Log("moveToBestTile: moving to tile " + targetTile.GetComponent<TileScript>().position.ToString());
+
+        // Return after waiting
+        yield return new WaitForSecondsRealtime(moveTime);
     }
 
     GameObject getBestTile(int searchRange)
@@ -43,25 +70,30 @@ public class EnemyAIController : MonoBehaviour
         GameObject bestTile = null;
 
         GameObject myTile = currentGrid.GetTileAtPos(myCharacter.gridPosition);
-        tilesInRange = currentGrid.GetAllPathsFromTile(myTile, searchRange);
+        tilesInRange = currentGrid.GetAllPathsFromTile(myTile, searchRange, true);
         tilesToSearch = tilesInRange.GetAllTiles();
 
         foreach (GameObject tile in tilesToSearch)
         {
+            PathTreeNode tilePath = tile.GetComponent<TileScript>().pathRef;
+
             // Get tile range from tile
-            int tRange = tile.GetComponent<TileScript>().pathRef.tileRange;
-
-            // See whether current tile is within movement range
-            bool inRange = (tRange > myCharacter.MV.baseValue);
-
-            // Calculate the heuristic value of the current tile
-            int newScore = calculateHeuristicValue(tile, currentGrid, inRange);
-
-            // Check whether this new tile is the current best
-            if (newScore > highScore)
+            if (tilePath != null)
             {
-                highScore = newScore;
-                bestTile = tile;
+                int tRange = tilePath.tileRange;
+
+                // See whether current tile is within movement range
+                bool inRange = (tRange > myCharacter.MV.baseValue);
+
+                // Calculate the heuristic value of the current tile
+                int newScore = calculateHeuristicValue(tile, currentGrid, inRange);
+
+                // Check whether this new tile is the current best
+                if (newScore > highScore)
+                {
+                    highScore = newScore;
+                    bestTile = tile;
+                }
             }
         }
 
@@ -120,11 +152,5 @@ public class EnemyAIController : MonoBehaviour
 
         // Compare the alliance of self and other and then return it
         return myCharacter.isPlayer() == otherCharScript.isPlayer();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
