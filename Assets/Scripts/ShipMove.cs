@@ -25,6 +25,7 @@ public class ShipMove : MonoBehaviour
         // Update Rotation
         transform.rotation = spawnRotation;
     }
+    
     void Update()
     {
         // Move in direction set by move direction
