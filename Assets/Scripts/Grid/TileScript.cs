@@ -30,4 +30,7 @@ public class TileScript : MonoBehaviour
 
     // Path to root
     public PathTreeNode pathRef;
+
+    // Experimental: heat map
+    public int heatVal = 0;
 }

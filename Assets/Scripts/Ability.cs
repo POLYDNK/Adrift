@@ -32,6 +32,9 @@ public class Ability : ScriptableObject
     public string inflictedStatus; //status that will be inflicted
 
     */
+    // AI Vars
+    public int abilityPower;
+    public bool singleTarget = true;
 
     public int baseDMG; //ability will always do a certain amount of damage regardless of DEF
     public int baseHP; //ability will always heal a certain amount of HP

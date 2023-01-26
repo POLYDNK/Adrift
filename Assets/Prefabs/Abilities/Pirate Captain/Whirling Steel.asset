@@ -15,6 +15,8 @@ MonoBehaviour:
   friendly: 0
   requiresTarget: 0
   free: 0
+  abilityPower: 0
+  singleTarget: 1
   baseDMG: 60
   baseHP: 0
   baseACC: 0
