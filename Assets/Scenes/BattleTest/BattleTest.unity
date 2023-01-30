@@ -1406,7 +1406,7 @@ MonoBehaviour:
   deadUnits: []
   turnQueue: []
   charCard: {fileID: 792736054}
-  crewTurnOrder: {fileID: 783148654}
+  crewTurnManager: {fileID: 783148654}
   canvas: {fileID: 865769687}
   actionCoin: {fileID: 5747914736462836886}
   moveCoin: {fileID: 5747914736746233003}
@@ -4514,6 +4514,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 806179491221990444, guid: a3e6463538b16bd43a2ee13c9e1eff61, type: 3}
+      propertyPath: moveDirection.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 806179491221990444, guid: a3e6463538b16bd43a2ee13c9e1eff61, type: 3}
+      propertyPath: moveDirection.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 858142471656375458, guid: a3e6463538b16bd43a2ee13c9e1eff61, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.7072302
@@ -6912,10 +6920,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64dd9d333fdfc254e9d93270c7186731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ControlSpeed: 6
-  PanSpeed: 3
-  MinHeight: 5
-  MaxHeight: 100
+  controlSpeed: 6
+  panSpeed: 3
+  minHeight: 5
+  maxHeight: 100
   objectFollowing: {fileID: 0}
 --- !u!82 &2054579721
 AudioSource:

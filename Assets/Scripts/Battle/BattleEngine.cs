@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 //Main controller for the battle system
@@ -81,6 +80,9 @@ public class BattleEngine : MonoBehaviour
     //AI Variables
     private PlayerActionList playerActions = new();
     private GameObject playerTarget; //Might be unnecessary
+    private static readonly int Hovered = Animator.StringToHash("hovered");
+    private static readonly int Selected = Animator.StringToHash("selected");
+    private static readonly int Interactable = Animator.StringToHash("interactable");
 
     // Start is called before the first frame update
     void Start() 
@@ -157,19 +159,19 @@ public class BattleEngine : MonoBehaviour
                         if(lastCoin != null)
                         {
                             Animator lastCoinAnimator = lastCoin.GetComponent<Animator>();
-                            lastCoinAnimator.SetBool("hovered", false);
-                            if(!lastCoinAnimator.GetBool("selected")) lastCoin.transform.GetChild(0).gameObject.SetActive(false); //Disable text of old coin
+                            lastCoinAnimator.SetBool(Hovered, false);
+                            if(!lastCoinAnimator.GetBool(Selected)) lastCoin.transform.GetChild(0).gameObject.SetActive(false); //Disable text of old coin
                         }
-                        coin.GetComponent<Animator>().SetBool("hovered", true);
+                        coin.GetComponent<Animator>().SetBool(Hovered, true);
                         hit.transform.GetChild(0).gameObject.SetActive(true); //Enable text of new coin
                     }
-                    else coin.GetComponent<Animator>().SetBool("hovered", false);
+                    else coin.GetComponent<Animator>().SetBool(Hovered, false);
 
                     if(Input.GetMouseButtonDown(0))
                     {
                         Animator coinAnimator = coin.GetComponent<Animator>();
                         // Select coin if it's interactable
-                        if(coinAnimator.GetBool("interactable"))
+                        if(coinAnimator.GetBool(Interactable))
                         {
                             SelectCoin(actionCoin, actionCoinAnimator, false);
                             SelectCoin(moveCoin, moveCoinAnimator, false);
@@ -178,10 +180,10 @@ public class BattleEngine : MonoBehaviour
                             SelectCoin(coin, coinAnimator, true);
                         }
                         // Handle various click actions
-                        if(coin == actionCoin && actionCoinAnimator.GetBool("interactable")) SelectAction();
-                        else if(coin == moveCoin && moveCoinAnimator.GetBool("interactable")) SelectMove();
-                        else if(coin == endCoin && endCoinAnimator.GetBool("interactable")) EndTurn();
-                        else if(coin == surrenderCoin && surrenderCoinAnimator.GetBool("interactable")) Surrender();
+                        if(coin == actionCoin && actionCoinAnimator.GetBool(Interactable)) SelectAction();
+                        else if(coin == moveCoin && moveCoinAnimator.GetBool(Interactable)) SelectMove();
+                        else if(coin == endCoin && endCoinAnimator.GetBool(Interactable)) EndTurn();
+                        else if(coin == surrenderCoin && surrenderCoinAnimator.GetBool(Interactable)) Surrender();
                     }
                     lastCoin = coin;
                 }
@@ -191,8 +193,8 @@ public class BattleEngine : MonoBehaviour
                     if(lastCoin != null)
                     {
                         Animator lastCoinAnimator = lastCoin.GetComponent<Animator>();
-                        lastCoinAnimator.SetBool("hovered", false);
-                        if(!lastCoinAnimator.GetBool("selected")) lastCoin.transform.GetChild(0).gameObject.SetActive(false); //Disable text of old coin
+                        lastCoinAnimator.SetBool(Hovered, false);
+                        if(!lastCoinAnimator.GetBool(Selected)) lastCoin.transform.GetChild(0).gameObject.SetActive(false); //Disable text of old coin
                         lastCoin = null;
                     }
                     
@@ -549,10 +551,10 @@ public class BattleEngine : MonoBehaviour
 
         // Setup coins based on whether it's the player's turn
         isPlayerTurn = IsAllyUnit(activeUnit);
-        actionCoinAnimator.SetBool("interactable", isPlayerTurn);
-        moveCoinAnimator.SetBool("interactable", isPlayerTurn);
-        endCoinAnimator.SetBool("interactable", isPlayerTurn);
-        surrenderCoinAnimator.SetBool("interactable", isPlayerTurn);
+        actionCoinAnimator.SetBool(Interactable, isPlayerTurn);
+        moveCoinAnimator.SetBool(Interactable, isPlayerTurn);
+        endCoinAnimator.SetBool(Interactable, isPlayerTurn);
+        surrenderCoinAnimator.SetBool(Interactable, isPlayerTurn);
 
         if(!isPlayerTurn)
         {
@@ -614,10 +616,32 @@ public class BattleEngine : MonoBehaviour
             turnQueue.RemoveAt(0);
             moved = false;
             acted = false;
-            activeUnit = null;
             LogicUpdate();
-            PickNewTurn();
+            //Move ships
+            StartCoroutine(EndTurnMoveShips());
+            activeUnit = null;
         }
+    }
+    
+    public IEnumerator EndTurnMoveShips()
+    {
+        // Before wait
+        active = false;
+        interactable = false;
+
+        DisableCoins();
+        
+        cam.GetComponent<CameraController>().SetCameraFollow(activeUnit);
+        playerShip.GetComponent<ShipController>().moveSpeed = 1.5F;
+        yield return new WaitForSecondsRealtime(1F);
+        playerShip.GetComponent<ShipController>().moveSpeed = 0F;
+        EnableCoins();
+
+        // After wait
+        active = true;
+        interactable = true;
+        LogicUpdate();
+        PickNewTurn();
     }
 
     public void SetupMove(GameObject objectTile) 
@@ -1149,21 +1173,21 @@ public class BattleEngine : MonoBehaviour
 
     public void EnableCoins() {
         if(!active) return;
-        if(!acted) actionCoinAnimator.SetBool("interactable", true);
-        if(!moved) moveCoinAnimator.SetBool("interactable", true);
-        endCoinAnimator.SetBool("interactable", true);
-        surrenderCoinAnimator.SetBool("interactable", true);
+        if(!acted) actionCoinAnimator.SetBool(Interactable, true);
+        if(!moved) moveCoinAnimator.SetBool(Interactable, true);
+        endCoinAnimator.SetBool(Interactable, true);
+        surrenderCoinAnimator.SetBool(Interactable, true);
     }
 
     public void DisableCoins() {
-        actionCoinAnimator.SetBool("interactable", false);
-        moveCoinAnimator.SetBool("interactable", false);
-        endCoinAnimator.SetBool("interactable", false);
-        surrenderCoinAnimator.SetBool("interactable", false);
+        actionCoinAnimator.SetBool(Interactable, false);
+        moveCoinAnimator.SetBool(Interactable, false);
+        endCoinAnimator.SetBool(Interactable, false);
+        surrenderCoinAnimator.SetBool(Interactable, false);
     }
 
     public void SelectCoin(GameObject coin, Animator animator, bool value) {
-        animator.SetBool("selected", value);
+        animator.SetBool(Selected, value);
         coin.transform.GetChild(0).gameObject.SetActive(value); //Set text
     }
 
