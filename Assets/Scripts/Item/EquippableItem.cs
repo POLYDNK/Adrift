@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum EquipmentType //defining equipment types
 {
@@ -33,12 +34,12 @@ public class EquippableItem : Item //extends Item class - has scriptableObject
 {
   //used for equipment parameter bonus that will be applied to character stats when equipped
   public List<StatModifier> modifiers;
-  [Space]
-  public EquipmentType EquipmentType;
+  [FormerlySerializedAs("EquipmentType")] [Space]
+  public EquipmentType equipmentType;
 
-  public void applyModifiers(CharacterStats character) {
+  public void ApplyModifiers(Character character) {
     foreach(StatModifier modifier in modifiers) {
-      character.addModifier(modifier);
+      character.AddModifier(modifier);
     }
   }
 }

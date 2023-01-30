@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Weapon : EquippableItem
 {
 
 
-    public int Durability; //Each use of this weapon will decrease its durability by 1. When this reaches 0, the weapon breaks.
+    [FormerlySerializedAs("Durability")] public int durability; //Each use of this weapon will decrease its durability by 1. When this reaches 0, the weapon breaks.
     public bool isBroken; //When broken, a weapon grant no bonuses until repaired
 
 
@@ -24,9 +25,9 @@ public class Weapon : EquippableItem
     public bool earlyGambit = false; //When using Gambit, accuracy is better earlier
     public bool lateGambit = false; //when using Gambit, accuracy is better later
 
-    [SerializeField]
-    public int MGT; //Might. Total attack is increased/decreased with this stat.
-    public int DurabilityMAX;
+    [FormerlySerializedAs("MGT")] [SerializeField]
+    public int mgt; //Might. Total attack is increased/decreased with this stat.
+    [FormerlySerializedAs("DurabilityMAX")] public int durabilityMax;
     public List<Ability> abilities; //abilities attached to this weapon
     public GameObject model;
 
@@ -36,34 +37,34 @@ public class Weapon : EquippableItem
     void Start()
     {
 
-        Durability = DurabilityMAX;
+        durability = durabilityMax;
         isBroken = false;
 
         
     }
 
 
-    public void weaponDamage(){
+    public void WeaponDamage(){
 
         if(isBroken){
             return;
         }
 
-        Durability--;
-        if(Durability == 0){
+        durability--;
+        if(durability == 0){
             isBroken = true;
         }
     }
 
-    public void weaponDamage(int value){
+    public void WeaponDamage(int value){
 
         if(isBroken){
             return;
         }
 
-        Durability -= value;
-        if(Durability <= 0){
-            Durability = 0;
+        durability -= value;
+        if(durability <= 0){
+            durability = 0;
             isBroken = true;
         }
     }

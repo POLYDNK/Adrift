@@ -31,15 +31,15 @@ public class BarteringManager : MonoBehaviour
 
     private Story currentStory;
 
-    public bool dialogueIsPlaying { get; private set; }
+    public bool DialogueIsPlaying { get; private set; }
 
     private Coroutine displayLineCoroutine;
 
     private static BarteringManager instance;
 
-    private const string SPEAKER_TAG = "speaker";
-    private const string PORTRAIT_TAG = "portrait";
-    private const string LAYOUT_TAG = "layout";
+    private const string SpeakerTag = "speaker";
+    private const string PortraitTag = "portrait";
+    private const string LayoutTag = "layout";
 
     private bool canContinueToNextLine = false;
 
@@ -62,7 +62,7 @@ public class BarteringManager : MonoBehaviour
     
     private void Start()
     {
-        dialogueIsPlaying = false;
+        DialogueIsPlaying = false;
         dialoguePanel.SetActive(true);
 
         
@@ -82,7 +82,7 @@ public class BarteringManager : MonoBehaviour
     private void Update()
     {
         // return right away if dialogue isn't playing
-        if(!dialogueIsPlaying)
+        if(!DialogueIsPlaying)
         {
             return;
         }
@@ -97,10 +97,10 @@ public class BarteringManager : MonoBehaviour
     
 
     
-    public void EnterDialogueMode(TextAsset inkJSON)
+    public void EnterDialogueMode(TextAsset inkJson)
     {
-        currentStory = new Story (inkJSON.text);
-        dialogueIsPlaying = true;
+        currentStory = new Story (inkJson.text);
+        DialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
 
         displayNameText.text = "???";
@@ -116,7 +116,7 @@ public class BarteringManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.2f);
 
-        dialogueIsPlaying = false;
+        DialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
     }
@@ -218,16 +218,16 @@ public class BarteringManager : MonoBehaviour
 
             switch (tagKey)
             {
-                case SPEAKER_TAG:
+                case SpeakerTag:
                     //Debug.Log("speaker=" + tagValue);
                     displayNameText.text = tagValue;
                     break;
-                case PORTRAIT_TAG:
+                case PortraitTag:
                     //Debug.Log("portrait=" + tagValue);
                     portraitAnimator.Play(tagValue);
 
                     break;
-                case LAYOUT_TAG:
+                case LayoutTag:
                     //Debug.Log("layout=" + tagValue);
                     layoutAnimator.Play(tagValue);
 

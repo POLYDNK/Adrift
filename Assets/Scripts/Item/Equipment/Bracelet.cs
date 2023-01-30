@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu]
 public class Bracelet : EquippableItem
 {
-    [SerializeField]
-    public int HealModifier;
+    [FormerlySerializedAs("HealModifier")] [SerializeField]
+    public int healModifier;
     
 
 }

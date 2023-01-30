@@ -13,13 +13,13 @@ public class DialogueManager : MonoBehaviour
     Message [] currentMessages;
     Actor [] currentActors;
     int activeMessage = 0;
-    public static bool isActive = false;
+    public static bool IsActive = false;
 
     public void OpenDialogue(Message [] messages, Actor [] actors){
         currentMessages = messages;
         currentActors = actors;
         activeMessage = 0;
-        isActive = true;
+        IsActive = true;
 
         Debug.Log("Started Conversation: Loaded Messages: " + messages.Length);
         DisplayMessage();
@@ -40,7 +40,7 @@ public class DialogueManager : MonoBehaviour
             DisplayMessage();
         } else {
             Debug.Log("Conversation ended:");
-            isActive = false;
+            IsActive = false;
         }
     }
 
@@ -53,7 +53,7 @@ public class DialogueManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isActive) {
+        if (Input.GetKeyDown(KeyCode.Space) && IsActive) {
             NextMessage();
         }
     }

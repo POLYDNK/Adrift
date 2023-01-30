@@ -7,7 +7,7 @@ using XNode;
 public class NodeParser : MonoBehaviour
 {
     public DialogueGraph graph;
-    Coroutine _parser;
+    Coroutine parser;
     public Text speaker;
     public Text dialogue;
     public Image speakerImage;                                
@@ -24,7 +24,7 @@ public class NodeParser : MonoBehaviour
             }
         }
 
-        _parser = StartCoroutine(ParseNode());
+        parser = StartCoroutine(ParseNode());
 
     }
 
@@ -55,10 +55,10 @@ public class NodeParser : MonoBehaviour
     public void NextNode(string fieldName)
     {
         //Find the port with this name.
-        if (_parser != null)
+        if (parser != null)
         {
-            StopCoroutine(_parser);
-            _parser = null;
+            StopCoroutine(parser);
+            parser = null;
         }
 
         foreach (NodePort p in graph.current.Ports)
@@ -71,7 +71,7 @@ public class NodeParser : MonoBehaviour
             }
         }
 
-        _parser = StartCoroutine(ParseNode());
+        parser = StartCoroutine(ParseNode());
 
     }
 

@@ -971,52 +971,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5283416272865759212, guid: a1dcd447bfbb3bc45821f8b436c031d2, type: 3}
   m_PrefabInstance: {fileID: 1409555453}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &335820657
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 335820658}
-  - component: {fileID: 335820659}
-  m_Layer: 0
-  m_Name: LoadingScene
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &335820658
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 335820657}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.036338, y: -0.3280077, z: -14.195208}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 10
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &335820659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 335820657}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f489da731b1bab045b579117f2ff5145, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LoadingScreen: {fileID: 0}
-  LoadingBarFill: {fileID: 0}
 --- !u!1 &624215861
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,12 +1347,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 537685639cc54d74db30142bbc82a236, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BOAT: {fileID: 0}
+  boat: {fileID: 0}
   zAxis: 0
   xAxis: 0
   yAxis: 0
   originalYAxis: 0
-  FloatUp: 0
+  floatUp: 0
   travel: 0
 --- !u!1 &788922812 stripped
 GameObject:
@@ -1417,12 +1371,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 537685639cc54d74db30142bbc82a236, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BOAT: {fileID: 0}
+  boat: {fileID: 0}
   zAxis: 0
   xAxis: 0
   yAxis: 0
   originalYAxis: 1
-  FloatUp: 1
+  floatUp: 1
   travel: 0
 --- !u!4 &788922818 stripped
 Transform:
@@ -2704,7 +2658,7 @@ RectTransform:
   - {fileID: 1447537418}
   - {fileID: 1195535465}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2726,7 +2680,7 @@ MonoBehaviour:
   goldTbox: {fileID: 0}
   boozeTbox: {fileID: 0}
   moraleTbox: {fileID: 0}
-  Canvas: {fileID: 0}
+  canvas: {fileID: 0}
   gold: 0
   booze: 0
   morale: 0
@@ -3037,9 +2991,9 @@ RectTransform:
   m_Father: {fileID: 1195535465}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: -150}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1503255165
@@ -3855,10 +3809,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64dd9d333fdfc254e9d93270c7186731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ControlSpeed: 0
-  PanSpeed: 6
-  MinHeight: 5
-  MaxHeight: 20
+  controlSpeed: 0
+  panSpeed: 6
+  minHeight: 5
+  maxHeight: 20
   objectFollowing: {fileID: 788922812}
 --- !u!1001 &1731950466
 PrefabInstance:
@@ -4091,14 +4045,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goldReward: 4
-  BoozeReward: 3
-  MoraleReward: 2
-  Enemies: 1
+  boozeReward: 3
+  moraleReward: 2
+  enemies: 1
   description: Fight a battle with pirates
   node: {fileID: 0}
   goToScene: BattleTest
-  LoadingScreen: {fileID: 1975254593}
-  LoadingBarFill: {fileID: 63060609}
+  loadingScreen: {fileID: 1975254593}
+  loadingBarFill: {fileID: 63060609}
   goldBox: {fileID: 0}
   goldBoxText: {fileID: 0}
   boozeBox: {fileID: 0}
@@ -4659,14 +4613,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goldReward: 6
-  BoozeReward: 5
-  MoraleReward: 4
-  Enemies: 3
+  boozeReward: 5
+  moraleReward: 4
+  enemies: 3
   description: Fight a battle with pirates
   node: {fileID: 0}
   goToScene: BattleTest
-  LoadingScreen: {fileID: 1975254593}
-  LoadingBarFill: {fileID: 63060609}
+  loadingScreen: {fileID: 1975254593}
+  loadingBarFill: {fileID: 63060609}
   goldBox: {fileID: 0}
   goldBoxText: {fileID: 0}
   boozeBox: {fileID: 0}
@@ -4923,14 +4877,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goldReward: 5
-  BoozeReward: 4
-  MoraleReward: 3
-  Enemies: 2
+  boozeReward: 4
+  moraleReward: 3
+  enemies: 2
   description: Fight a battle with pirates
   node: {fileID: 0}
   goToScene: BattleTest
-  LoadingScreen: {fileID: 1975254593}
-  LoadingBarFill: {fileID: 63060609}
+  loadingScreen: {fileID: 1975254593}
+  loadingBarFill: {fileID: 63060609}
   goldBox: {fileID: 0}
   goldBoxText: {fileID: 0}
   boozeBox: {fileID: 0}
@@ -5505,14 +5459,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goldReward: 10
-  BoozeReward: 5
-  MoraleReward: 6
-  Enemies: 4
+  boozeReward: 5
+  moraleReward: 6
+  enemies: 4
   description: Fight a battle with pirates
   node: {fileID: 0}
   goToScene: BattleTest
-  LoadingScreen: {fileID: 1975254593}
-  LoadingBarFill: {fileID: 63060609}
+  loadingScreen: {fileID: 1975254593}
+  loadingBarFill: {fileID: 63060609}
   goldBox: {fileID: 0}
   goldBoxText: {fileID: 0}
   boozeBox: {fileID: 0}

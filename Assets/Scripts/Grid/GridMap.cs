@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridMap
 {
-    public int gridSelected = 0;
+    public int GridSelected = 0;
 
     // ----- Default Grid -----
     public const uint DefaultGridWidth = 8;
@@ -230,7 +230,7 @@ public class GridMap
 
     // Constructors
     public GridMap() {}
-    public GridMap(int gridNumber) {gridSelected = gridNumber;}
+    public GridMap(int gridNumber) {GridSelected = gridNumber;}
 
     // Select a grid map
     public void SelectGrid(int gridNumber)
@@ -238,20 +238,20 @@ public class GridMap
         switch (gridNumber)
         {
             case 0:
-                gridSelected = 0;
+                GridSelected = 0;
                 break;
             case 1:
-                gridSelected = 1;
+                GridSelected = 1;
                 break;
             case 2:
-                gridSelected = 2;
+                GridSelected = 2;
                 break;
             case 3:
-                gridSelected = 3;
+                GridSelected = 3;
                 break;
             default:
                 Debug.Log("SelectGrid(): Error! Grid number is out of range. Selecting default grid instead");
-                gridSelected = 0;
+                GridSelected = 0;
                 break;
         }
     }
@@ -261,7 +261,7 @@ public class GridMap
     {  
         uint widthToReturn = 0;
 
-        switch(gridSelected)
+        switch(GridSelected)
         {
             case 0:
                 widthToReturn = DefaultGridWidth;
@@ -288,7 +288,7 @@ public class GridMap
     {  
         uint heightToReturn = 0;
 
-        switch(gridSelected)
+        switch(GridSelected)
         {
             case 0:
                 heightToReturn = DefaultGridHeight;
@@ -315,7 +315,7 @@ public class GridMap
     {
         bool flagAtPos = false;
 
-        switch(gridSelected)
+        switch(GridSelected)
         {
             case 0:
                 flagAtPos = DefaultGridPassableFlags[pos.y, pos.x];
@@ -342,7 +342,7 @@ public class GridMap
     {
         float offsetAtPos = 0.0f;
 
-        switch(gridSelected)
+        switch(GridSelected)
         {
             case 0:
                 offsetAtPos = 0.0f;

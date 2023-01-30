@@ -15,7 +15,7 @@ public class TileScript : MonoBehaviour
     // Game object references
     public GameObject characterOn = null;
     public GameObject objectOn = null;
-    public GridBehavior targetGrid = null;
+    public Grid targetGrid = null;
     public TileScript targetTile = null;
 
     // Flags
@@ -29,7 +29,7 @@ public class TileScript : MonoBehaviour
     public int myLayer;
 
     // Path to root
-    public PathTreeNode pathRef;
+    public PathTreeNode PathRef;
 
     // Experimental: heat map
     public int heatVal = 0;

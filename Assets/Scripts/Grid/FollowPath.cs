@@ -8,7 +8,7 @@ public class FollowPath : MonoBehaviour
     [SerializeField] public float moveSpeed = 3.0f;
 
     // A stack of path nodes that link to the position of tiles
-    public Stack<PathTreeNode> pathToFollow = new Stack<PathTreeNode>();
+    public Stack<PathTreeNode> PathToFollow = new Stack<PathTreeNode>();
     // Raw distance for ability movement
     public Vector2Int abilityDist;
 
@@ -45,8 +45,8 @@ public class FollowPath : MonoBehaviour
             else if(abilityDist.x < 0) abilityDist.x++;
             if(abilityDist.y > 0) abilityDist.y--;
             else if(abilityDist.y < 0) abilityDist.y++;
-            var character = this.gameObject.GetComponent<CharacterStats>();
-            targetTile = character.myGrid.GetComponent<GridBehavior>().GetTileAtPos(character.gridPosition + new Vector2Int(abilityDist.x != 0 ? (int) Mathf.Sign(abilityDist.x) : 0, abilityDist.y != 0 ? (int) Mathf.Sign(abilityDist.y) : 0));
+            var character = this.gameObject.GetComponent<Character>();
+            targetTile = character.myGrid.GetComponent<Grid>().GetTileAtPos(character.gridPosition + new Vector2Int(abilityDist.x != 0 ? (int) Mathf.Sign(abilityDist.x) : 0, abilityDist.y != 0 ? (int) Mathf.Sign(abilityDist.y) : 0));
             float targetDist = Vector3.Distance(transform.position, targetPos);
             if(targetTile != null && targetDist > 0.0f) {
                 tileSet = true;
@@ -56,7 +56,7 @@ public class FollowPath : MonoBehaviour
         else {
 
         // Audio
-        if (pathToFollow.Count > 0)
+        if (PathToFollow.Count > 0)
         {
             if (audioData.isPlaying == false)
             {
@@ -69,10 +69,10 @@ public class FollowPath : MonoBehaviour
         }
 
         // Get a new tile to travel to when these conditions are met
-        while (pathToFollow != null && pathToFollow.Count > 0 && !tileSet)
+        while (PathToFollow != null && PathToFollow.Count > 0 && !tileSet)
         {
             // Get the next node
-            targetTile = pathToFollow.Pop().myTile;
+            targetTile = PathToFollow.Pop().MyTile;
 
             // Test whether the target position is different from the current position
             distToTarget = Vector3.Distance(transform.position, targetPos);
@@ -116,13 +116,13 @@ public class FollowPath : MonoBehaviour
                 transform.position += targetDirection * (wasAbility ? 8.0f : moveSpeed) * Time.deltaTime;
 
                 // Update y-axis rotation
-                if(!wasAbility) this.gameObject.GetComponent<CharacterStats>().rotateTowards(targetPos);
+                if(!wasAbility) this.gameObject.GetComponent<Character>().RotateTowards(targetPos);
             }
         }
         else this.gameObject.GetComponent<Animator>().SetBool("isMoving", false);
     }
 
-    public bool isMoving() {
+    public bool IsMoving() {
         return tileSet;
     }
 }

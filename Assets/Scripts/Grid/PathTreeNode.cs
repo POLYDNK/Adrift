@@ -5,19 +5,19 @@ using UnityEngine;
 public class PathTreeNode
 {
     // Parent node
-    public PathTreeNode parent = null;
+    public PathTreeNode Parent = null;
 
     // Cardinal directions
-    public PathTreeNode up = null;
-    public PathTreeNode down = null;
-    public PathTreeNode left = null;
-    public PathTreeNode right = null;
+    public PathTreeNode Up = null;
+    public PathTreeNode Down = null;
+    public PathTreeNode Left = null;
+    public PathTreeNode Right = null;
 
     // My tile
-    public GameObject myTile = null;
+    public GameObject MyTile = null;
 
     // Tile range
-    public int tileRange;
+    public int TileRange;
 
     // Self and child tiles as a list
     private List<GameObject> allTiles = null;
@@ -26,21 +26,21 @@ public class PathTreeNode
     public PathTreeNode() {}
     public PathTreeNode(PathTreeNode p, GameObject t, int range)
     {
-        parent = p;
-        myTile = t;
-        myTile.GetComponent<TileScript>().pathRef = this;
-        tileRange = range;
+        Parent = p;
+        MyTile = t;
+        MyTile.GetComponent<TileScript>().PathRef = this;
+        TileRange = range;
     }
 
-    public PathTreeNode copy() {
+    public PathTreeNode Copy() {
         PathTreeNode p = new PathTreeNode();
-        if(p.parent != null) p.parent = parent.copy();
-        if(p.up != null) p.up = up.copy();
-        if(p.down != null) p.down = down.copy();
-        if(p.left != null) p.left = left.copy();
-        if(p.right != null) p.right = right.copy();
-        p.myTile = myTile;
-        p.tileRange = tileRange;
+        if(p.Parent != null) p.Parent = Parent.Copy();
+        if(p.Up != null) p.Up = Up.Copy();
+        if(p.Down != null) p.Down = Down.Copy();
+        if(p.Left != null) p.Left = Left.Copy();
+        if(p.Right != null) p.Right = Right.Copy();
+        p.MyTile = MyTile;
+        p.TileRange = TileRange;
         return p;
     }
 
@@ -54,15 +54,15 @@ public class PathTreeNode
         path.Push(this);
 
         // Do this until the root is found
-        while (currentNode.parent != null)
+        while (currentNode.Parent != null)
         {
             // Add the current node's parent to path
-            path.Push(currentNode.parent);
+            path.Push(currentNode.Parent);
 
             //Debug.Log("Adding tile at position " + currentNode.myTile.transform.position.ToString() + " to path");
 
             // Go to parent
-            currentNode = currentNode.parent;
+            currentNode = currentNode.Parent;
         }
         
         return path;
@@ -78,15 +78,15 @@ public class PathTreeNode
         path.Add(this);
 
         // Do this until the root is found
-        while (currentNode.parent != null)
+        while (currentNode.Parent != null)
         {
             // Add the current node's parent to path
-            path.Add(currentNode.parent);
+            path.Add(currentNode.Parent);
 
             //Debug.Log("Adding tile at position " + currentNode.myTile.transform.position.ToString() + " to path");
 
             // Go to parent
-            currentNode = currentNode.parent;
+            currentNode = currentNode.Parent;
         }
         
         return path;
@@ -109,13 +109,13 @@ public class PathTreeNode
     private void PathTreePreOrder(PathTreeNode currNode)
     {
         // Put the tile object of the current node onto the list
-        allTiles.Add(currNode.myTile);
+        allTiles.Add(currNode.MyTile);
 
         // Visit the Up, Down, Left, and Right nodes if able
-        if (currNode.up != null)    { PathTreePreOrder(currNode.up);    }
-        if (currNode.down != null)  { PathTreePreOrder(currNode.down);  }
-        if (currNode.left != null)  { PathTreePreOrder(currNode.left);  }
-        if (currNode.right != null) { PathTreePreOrder(currNode.right); }
+        if (currNode.Up != null)    { PathTreePreOrder(currNode.Up);    }
+        if (currNode.Down != null)  { PathTreePreOrder(currNode.Down);  }
+        if (currNode.Left != null)  { PathTreePreOrder(currNode.Left);  }
+        if (currNode.Right != null) { PathTreePreOrder(currNode.Right); }
     }
 
     // Puts a path of nodes, to the root, onto a stack
@@ -128,15 +128,15 @@ public class PathTreeNode
         stack.Push(this);
 
         // Do this until the root is found
-        while (currentNode.parent != null)
+        while (currentNode.Parent != null)
         {
             // Add the current node's parent to path
-            stack.Push(currentNode.parent);
+            stack.Push(currentNode.Parent);
 
             //Debug.Log("Adding tile at position " + currentNode.myTile.transform.position.ToString() + " to path");
 
             // Go to parent
-            currentNode = currentNode.parent;
+            currentNode = currentNode.Parent;
         }
     }
 }
