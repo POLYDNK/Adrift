@@ -573,6 +573,9 @@ public class BattleEngine : MonoBehaviour
             RefreshActionButtons();
             SelectMove(); //Default to move (generally units move before acting)
         }
+
+        // Heatmap Generation
+        HeatmapGenerator.GenerateHeatmap(aliveUnits, activeUnit);
     }
 
     //End the active unit's turn
