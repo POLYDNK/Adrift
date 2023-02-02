@@ -18,9 +18,14 @@ public class CameraController : MonoBehaviour
     [SerializeField] public GameObject objectFollowing = null;
     private Vector3 target;
 
+    // Debug Mode
+    [SerializeField] public bool debugMode;
+    private bool inDebug = false;
+
     // If this camera is being controlled by the player
     private bool controlling = false;
     private bool travelingToTarget = false;
+    private Layermode currentCullingMask;
 
     // Layer modes
     public enum Layermode
@@ -87,6 +92,13 @@ public class CameraController : MonoBehaviour
         if (Input.GetKey(KeyCode.Keypad3))
         {
             SetLayerMode(Layermode.Cabin);
+        }
+
+        // Debug mode change detection
+        if (debugMode != inDebug)
+        {
+            inDebug = debugMode;    
+            SetLayerMode(currentCullingMask);
         }
     }
 
@@ -176,6 +188,12 @@ public class CameraController : MonoBehaviour
                 break;
         }
 
+        // Debug mode layer
+        if (debugMode)
+        {
+            layerMask |= (1 << 13); // Debug
+        }
+
         // Painfully render appropiate objects to be invisible
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Tile");
         foreach (GameObject tile in objects)
@@ -196,5 +214,6 @@ public class CameraController : MonoBehaviour
 
         // Apply culling
         this.GetComponent<Camera>().cullingMask = layerMask;
+        currentCullingMask = lm;
     }
 }

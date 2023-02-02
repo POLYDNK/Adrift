@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 3744224348081651429}
   - component: {fileID: 6909541270901499172}
   - component: {fileID: 7509004607435238951}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: heatMapVal
   m_TagString: Untagged
   m_Icon: {fileID: 0}

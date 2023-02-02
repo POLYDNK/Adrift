@@ -478,7 +478,6 @@ public class Grid : MonoBehaviour
         GameObject charToMove = null;
         bool moveSuccess = false;
 
-
         // Check whether tiles are in range
         if (TilePosInRange(sourcePos) && TilePosInRange(destPos))
         {
@@ -491,7 +490,7 @@ public class Grid : MonoBehaviour
             var destTileScript = destTile.GetComponent<TileScript>();
 
             // Make a new path tree
-            //sourceTileScipt.pathRef = GetAllPathsFromTile(sourceTile, maxRange+1, true);
+            sourceTileScipt.PathRef = GetAllPathsFromTile(sourceTile, maxRange+1, true);
 
             // Get character on source tile
             if (sourceTileScipt.hasCharacter && !destTileScript.hasCharacter && destTileScript.passable)

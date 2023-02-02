@@ -8,9 +8,16 @@ public static class HeatmapGenerator
     private static Grid currentGrid;
     private static Character activeChar;
     private static TileScript activeTile;
+    private static TileScript bestTile;
+    private static int highScore;
 
     public static void GenerateHeatmap(List<GameObject> allUnits, GameObject activeUnit)
     {
+        // Reset
+        bestTile = null;
+        highScore = int.MinValue;
+        ResetHeatValues();
+
         // Get active char script
         activeChar = activeUnit.GetComponent<Character>();
         activeTile = activeChar.myGrid.GetComponent<Grid>().GetTileAtPos(activeChar.gridPosition).GetComponent<TileScript>();
@@ -27,24 +34,41 @@ public static class HeatmapGenerator
                 currentGrid = charScript.myGrid.GetComponent<Grid>();
 
                 // Ability Heat
-                SingleAbilityHeat(unit, charScript.basicAttack, charScript.gridPosition);
+                AllAbilityHeat(charScript);
             }
         }
     }
 
-    static void AllAbilityHeat(GameObject unit)
+    // Reset the heat value of all tiles to 0
+    static void ResetHeatValues()
     {
-
+        // Painfully reset the heat value by getting the tile's script (slow)
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Tile");
+        foreach (GameObject tile in objects)
+        {
+            tile.GetComponent<TileScript>().heatVal = 0;
+        }
     }
 
-    static void SingleAbilityHeat(GameObject unit, Ability ability, Vector2Int pos)
+    // Heat generation for every action the active character can do
+    static void AllAbilityHeat(Character charScript)
+    {
+        // Generate heat for every battle ability of the active character
+        foreach(Ability ability in activeChar.GetBattleAbilities())
+        {
+            SingleAbilityHeat(charScript, ability, charScript.gridPosition);
+        }
+    }
+
+    // Heat generation for a single ability
+    static void SingleAbilityHeat(Character charScript, Ability ability, Vector2Int pos)
     {
         // Get data from ability
         int searchRange = ability.range;
         int power = ability.baseDmg + ability.baseHp;
 
         // Include enemy checking here plzzz
-        if (ability.friendly == IsAlly(unit))
+        if (ability.friendly == IsAlly(charScript))
         {
             // Get what tiles we need to touch
             GameObject myTile = currentGrid.GetTileAtPos(pos);
@@ -59,19 +83,30 @@ public static class HeatmapGenerator
                 // If the tile doesn't have a character on it
                 if (tileScript.hasCharacter == false || pos == activeTile.position)
                 {
-                    tileScript.heatVal = power;
+                    // Since the active character can use an ability from this square,
+                    // we'll increase the heat of this tile
+                    tileScript.heatVal += power;
+
+                    // Check whether the high score is beaten
+                    if (tileScript.heatVal > highScore)
+                    {
+                        highScore = tileScript.heatVal;
+                        bestTile = tileScript;
+                    }
                 }
             }
         }
     }
 
     // Helper function to determine allies and enemys
-    static bool IsAlly(GameObject characterObj)
+    static bool IsAlly(Character charScript)
     {
-        // Get the script of the other character
-        var otherCharScript = characterObj.GetComponent<Character>();
-
         // Compare the alliance of self and other and then return it
-        return activeChar.IsPlayer() == otherCharScript.IsPlayer();
+        return activeChar.IsPlayer() == charScript.IsPlayer();
+    }
+
+    public static TileScript GetBestTile()
+    {
+        return bestTile;
     }
 }
