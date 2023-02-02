@@ -19,16 +19,16 @@ public class EnemyAIController : MonoBehaviour
 
     public IEnumerator PerformTurn(float endTime)
     {
+        if (battleScript == null)
+        {
+            battleScript = GameObject.Find("BattleEngine").GetComponent<BattleEngine>();
+        }
+        
         hasMoved = false;
         currentGrid = myCharacter.myGrid.GetComponent<Grid>();
 
         Debug.Log("performTurn: moving to best tile");
         StartCoroutine(MoveToBestTile(2.0f));
-
-        if (battleScript == null)
-        {
-            battleScript = GameObject.Find("BattleEngine").GetComponent<BattleEngine>();
-        }
 
         battleScript.EndTurn();
         battleScript.LogicUpdate();

@@ -622,7 +622,6 @@ public class BattleEngine : MonoBehaviour
             LogicUpdate();
             //Move ships
             StartCoroutine(EndTurnMoveShips());
-            activeUnit = null;
         }
     }
     
