@@ -7,6 +7,7 @@ public static class HeatmapGenerator
     // Private vars
     private static Grid currentGrid;
     private static Character activeChar;
+    private static GameObject activeTileObj;
     private static TileScript activeTile;
     private static TileScript bestTile;
     private static int highScore;
@@ -20,8 +21,11 @@ public static class HeatmapGenerator
 
         // Get active char script
         activeChar = activeUnit.GetComponent<Character>();
-        activeTile = activeChar.myGrid.GetComponent<Grid>().GetTileAtPos(activeChar.gridPosition).GetComponent<TileScript>();
+        activeTileObj = activeChar.myGrid.GetComponent<Grid>().GetTileAtPos(activeChar.gridPosition);
+        activeTile = activeTileObj.GetComponent<TileScript>();
 
+        // Generate heat around the tiles of all units based on what
+        // abilities the active character can use
         foreach (GameObject unit in allUnits)
         {
             // Do not include active char for ability search
@@ -37,6 +41,10 @@ public static class HeatmapGenerator
                 AllAbilityHeat(charScript);
             }
         }
+
+        // Generate extra heat for tiles the active char can move to
+        currentGrid = activeChar.myGrid.GetComponent<Grid>();
+        MovementHeat(20);
     }
 
     // Reset the heat value of all tiles to 0
@@ -98,6 +106,32 @@ public static class HeatmapGenerator
         }
     }
 
+    static void MovementHeat(int moveWeight)
+    {
+        // Get what tiles we need to touch
+        GameObject myTile = currentGrid.GetTileAtPos(activeTile.position);
+        PathTreeNode tilesInRange = currentGrid.GetAllPathsFromTile(activeTileObj, activeChar.mv.baseValue);
+        List<GameObject> tiles = tilesInRange.GetAllTiles();
+
+        // Do this for every tile within movement range
+        foreach (GameObject tile in tiles)
+        {
+            // Get tile script
+            TileScript tileScript = tile.GetComponent<TileScript>();
+
+            // Since the active character can move to this tile,
+            // we'll increase the heat of this tile
+            tileScript.heatVal += moveWeight;
+
+            // Check whether the high score is beaten
+            if (tileScript.heatVal > highScore)
+            {
+                highScore = tileScript.heatVal;
+                bestTile = tileScript;
+            }
+        }
+    }
+
     // Helper function to determine allies and enemys
     static bool IsAlly(Character charScript)
     {
@@ -107,6 +141,8 @@ public static class HeatmapGenerator
 
     public static TileScript GetBestTile()
     {
+        Debug.Log("HeatmapGenerator: the best tile has a score of " + highScore.ToString());
+
         return bestTile;
     }
 }

@@ -160,8 +160,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91a3423debaa5e842aa272f7f3733602, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SplashEffect: {fileID: 1722726733478836, guid: c1c88308ebb5d2541a282905b854ee4c, type: 3}
-  CharStats: {fileID: 6886658739876458237}
+  splashEffect: {fileID: 1722726733478836, guid: c1c88308ebb5d2541a282905b854ee4c, type: 3}
+  charStats: {fileID: 6886658739876458237}
 --- !u!114 &8950800040269234671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,7 +201,6 @@ GameObject:
   - component: {fileID: 1640716338498495246}
   - component: {fileID: -4097838735445531169}
   - component: {fileID: 7579011058502389470}
-  - component: {fileID: -7707855937809944363}
   m_Layer: 9
   m_Name: Pirate
   m_TagString: Character
@@ -238,58 +237,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a50fdbd8c5f86b46b6a74ac706fc930, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HPMAX:
+  hpmax:
     baseValue: 200
     min: 20
     max: 2000
     type: 0
-  APMAX:
+  apmax:
     baseValue: 3
     min: 1
     max: 9
     type: 1
-  STR:
+  str:
     baseValue: 25
     min: 1
     max: 50
     type: 2
-  DEF:
+  def:
     baseValue: 12
     min: 1
     max: 50
     type: 3
-  SPD:
+  spd:
     baseValue: 15
     min: 1
     max: 50
     type: 4
-  DEX:
+  dex:
     baseValue: 20
     min: 1
     max: 50
     type: 5
-  LCK:
+  lck:
     baseValue: 20
     min: 1
     max: 50
     type: 6
-  MV:
+  mv:
     baseValue: 5
     min: 1
     max: 10
     type: 7
-  HP: 200
-  AP: 0
-  ATK: 0
-  HIT: 0
-  CRIT: 0
-  AVO: 0
-  charmRES: 0
-  tauntRES: 0
-  DMGimmune: 0
+  hp: 200
+  ap: 0
+  atk: 0
+  hit: 0
+  crit: 0
+  avo: 0
+  charmRes: 0
+  tauntRes: 0
+  dmgImmune: 0
   statModifiers: []
-  Name: Dummy
-  classname: 0
+  displayName: Dummy
+  className: 0
   basicAttack: {fileID: 11400000, guid: 7b15c7ffff3c0454ba167d4755a19e4b, type: 2}
   comboAttack: {fileID: 11400000, guid: f2f9a97eeb0aa4241b5b5672ef36d498, type: 2}
   abilities:
@@ -299,11 +298,11 @@ MonoBehaviour:
   healthBarScale: 2
   healthBar: {fileID: 4151192400801874901}
   healthBarYOffset: 1
-  APBarScale: 2
-  APBar: {fileID: 6470564073036487882}
-  APBarYOffset: 1.25
+  apBarScale: 2
+  apBar: {fileID: 6470564073036487882}
+  apBarYOffset: 1.25
   canvas: {fileID: 0}
-  DamageText: {fileID: 8133978484208511556, guid: 87660d197cb3d9c4a90de7de09cea50e, type: 3}
+  damageText: {fileID: 8133978484208511556, guid: 87660d197cb3d9c4a90de7de09cea50e, type: 3}
   model: {fileID: 80955432679685461}
   icon: {fileID: 21300000, guid: 98eea29843f366c4bbbb98fd92cf2bed, type: 3}
   gridPosition: {x: 3, y: 10}
@@ -317,7 +316,7 @@ MonoBehaviour:
   bracelet: {fileID: 0}
   shoes: {fileID: 0}
   aura: {fileID: 0}
-  Morale: 0
+  morale: 0
 --- !u!114 &1640716338498495246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,21 +447,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &-7707855937809944363
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5537537504233135668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddccaf7cfb93dd44785fe7d01cccd193, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myCharacter: {fileID: 6886658739876458237}
-  battleScript: {fileID: 0}
-  movePath: {fileID: 1640716338498495246}
 --- !u!1001 &2079620047381799436
 PrefabInstance:
   m_ObjectHideFlags: 0

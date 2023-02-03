@@ -77,16 +77,22 @@ public class BattleEngine : MonoBehaviour
     private GameObject selectedGrid;
     private int lastXDist, lastYDist; //Last distance between user and target for ability selection
 
-    //AI Variables
+    //AI Variables (OLD)
     private PlayerActionList playerActions = new();
     private GameObject playerTarget; //Might be unnecessary
     private static readonly int Hovered = Animator.StringToHash("hovered");
     private static readonly int Selected = Animator.StringToHash("selected");
     private static readonly int Interactable = Animator.StringToHash("interactable");
 
+    // AI Variables (NEW)
+    private EnemyAIController AIController;
+
     // Start is called before the first frame update
     void Start() 
     {
+        // Setup AI Controller
+        AIController = new EnemyAIController(this);
+
         // Temporary assignment of ships, crews should be passed in somewhere since they're permanent
         playerCrew.GetComponent<Crew>().ship = playerShip;
         enemyCrew.GetComponent<Crew>().ship = enemyShip;
@@ -635,7 +641,7 @@ public class BattleEngine : MonoBehaviour
         
         cam.GetComponent<CameraController>().SetCameraFollow(activeUnit);
         playerShip.GetComponent<ShipController>().moveSpeed = 1.5F;
-        yield return new WaitForSecondsRealtime(1F);
+        yield return new WaitForSecondsRealtime(0F);
         playerShip.GetComponent<ShipController>().moveSpeed = 0F;
         EnableCoins();
 
@@ -1218,7 +1224,7 @@ public class BattleEngine : MonoBehaviour
         Debug.Log("doAITurn: AI Turn began");
 
         //StartCoroutine(aiTurnWaiter());
-        StartCoroutine(activeUnit.GetComponent<EnemyAIController>().PerformTurn(2.0f));
+        StartCoroutine(AIController.PerformTurn(activeUnit.GetComponent<Character>(), 2.0f, 2.0f));
     }
 
     IEnumerator AITurnWaiter()

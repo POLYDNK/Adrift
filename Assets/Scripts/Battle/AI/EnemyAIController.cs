@@ -1,13 +1,12 @@
 /// @author: Bryson Squibb
 /// @date: 01/22/2023
 /// @description: this script controls the behavior of an NPC.
-/// It is meant to be attached to a character object.
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyAIController : MonoBehaviour
+public class EnemyAIController
 {
     // Component References
     [SerializeField] public Character myCharacter;
@@ -17,28 +16,21 @@ public class EnemyAIController : MonoBehaviour
     private Grid currentGrid;
     private bool hasMoved;
 
-    public IEnumerator PerformTurn(float endTime)
+    public EnemyAIController(BattleEngine be)
     {
-        if (battleScript == null)
-        {
-            battleScript = GameObject.Find("BattleEngine").GetComponent<BattleEngine>();
-        }
-        
-        hasMoved = false;
+        // Get battle engine script
+        battleScript = be;
+    }
+
+    public IEnumerator PerformTurn(Character character, float moveTime, float endTime)
+    {
+        // Setup
+        myCharacter = character;
+        hasMoved    = false;
         currentGrid = myCharacter.myGrid.GetComponent<Grid>();
 
         Debug.Log("performTurn: moving to best tile");
-        StartCoroutine(MoveToBestTile(2.0f));
-
-        battleScript.EndTurn();
-        battleScript.LogicUpdate();
-
-        // Return after waiting
-        yield return new WaitForSecondsRealtime(endTime);
-    }
-
-    IEnumerator MoveToBestTile(float moveTime)
-    {
+        
         // Generate Heatmap
         HeatmapGenerator.GenerateHeatmap(battleScript.aliveUnits, battleScript.activeUnit);
 
@@ -48,6 +40,7 @@ public class EnemyAIController : MonoBehaviour
         // Perform move
         Vector2Int newPosition = targetTile.position;
 
+        // Check whether the char actually needs to move before doing do
         if (myCharacter.gridPosition != newPosition)
         {
             currentGrid.MoveTowardsTile(myCharacter.gridPosition, newPosition, 
@@ -55,9 +48,15 @@ public class EnemyAIController : MonoBehaviour
             hasMoved = true;
         }
 
-        Debug.Log("moveToBestTile: moving to tile " + targetTile.GetComponent<TileScript>().position.ToString());
+        //Debug.Log("moveToBestTile: moving to tile " + targetTile.GetComponent<TileScript>().position.ToString());
 
-        // Return after waiting
+        // Move time
         yield return new WaitForSecondsRealtime(moveTime);
+
+        battleScript.EndTurn();
+        battleScript.LogicUpdate();
+
+        // End time
+        yield return new WaitForSecondsRealtime(endTime);
     }
 }

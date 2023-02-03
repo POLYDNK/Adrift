@@ -489,8 +489,9 @@ public class Grid : MonoBehaviour
             GameObject destTile = Tiles[destPos.x, destPos.y];
             var destTileScript = destTile.GetComponent<TileScript>();
 
-            // Make a new path tree
-            sourceTileScipt.PathRef = GetAllPathsFromTile(sourceTile, maxRange+1, true);
+            // Make a new path tree (Warning: we must reach the destination tile for this to work.
+            // Right now this is achieved by making the range huge, but it's not efficient)
+            sourceTileScipt.PathRef = GetAllPathsFromTile(sourceTile, maxRange+100);
 
             // Get character on source tile
             if (sourceTileScipt.hasCharacter && !destTileScript.hasCharacter && destTileScript.passable)
@@ -519,7 +520,7 @@ public class Grid : MonoBehaviour
                     // Move character to the new destination, instead
                     destTileScript.PathRef.PathToRootOnStack(charToMove.GetComponent<FollowPath>().PathToFollow);
 
-                    // Move camera to destPos
+                    // Set camera to follow moving character
                     cam.GetComponent<CameraController>().SetCameraFollow(charToMove);
 
                     // Set source tile data
@@ -534,6 +535,10 @@ public class Grid : MonoBehaviour
                     charToMove.GetComponent<Character>().gridPosition = destTileScript.position;
 
                     moveSuccess = true;
+                }
+                else
+                {
+                    Debug.Log("MoveTowardsTile: Error! cannot move to unhighlighted tiles");
                 }
             }
             else

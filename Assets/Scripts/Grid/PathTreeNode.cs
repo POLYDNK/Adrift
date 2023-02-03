@@ -101,6 +101,8 @@ public class PathTreeNode
         // Call a helper function to populate the list
         PathTreePreOrder(this);
 
+        //Debug.Log("PathTreeNode: returning a list with " + allTiles.Count + " in it");
+
         // Return the populated list
         return allTiles;
     }
@@ -109,7 +111,10 @@ public class PathTreeNode
     private void PathTreePreOrder(PathTreeNode currNode)
     {
         // Put the tile object of the current node onto the list
-        allTiles.Add(currNode.MyTile);
+        if (allTiles.Contains(currNode.MyTile) == false)
+        {
+            allTiles.Add(currNode.MyTile);
+        }
 
         // Visit the Up, Down, Left, and Right nodes if able
         if (currNode.Up != null)    { PathTreePreOrder(currNode.Up);    }
