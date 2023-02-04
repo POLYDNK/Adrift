@@ -139,13 +139,6 @@ public static class HeatmapGenerator
         return activeChar.IsPlayer() == charScript.IsPlayer();
     }
 
-    // Helper function to determine allies and enemys
-    public static bool IsAlly(Character charA, Character charB)
-    {
-        // Compare the alliance of self and other and then return it
-        return charA.IsPlayer() == charB.IsPlayer();
-    }
-
     public static TileScript GetBestTile()
     {
         Debug.Log("HeatmapGenerator: the best tile has a score of " + highScore.ToString());

@@ -15,7 +15,6 @@ public class EnemyAIController
     // Private Vars
     private Grid currentGrid;
     private GameObject currentTile;
-    private bool hasMoved;
     private List<ValidTarget> validTargets = null;
 
     public EnemyAIController(BattleEngine be)
@@ -28,7 +27,6 @@ public class EnemyAIController
     {
         // Setup
         myCharacter = character;
-        hasMoved    = false;
         currentGrid = myCharacter.myGrid.GetComponent<Grid>();
 
         Debug.Log("performTurn: moving to best tile");
@@ -40,8 +38,8 @@ public class EnemyAIController
 
         PerformAction();
 
-        battleScript.EndTurn();
-        battleScript.LogicUpdate();
+        //battleScript.EndTurn();
+        //battleScript.LogicUpdate();
 
         // End time
         yield return new WaitForSecondsRealtime(endTime);
@@ -63,7 +61,11 @@ public class EnemyAIController
         {
             currentGrid.MoveTowardsTile(myCharacter.gridPosition, newPosition, 
                                         false, myCharacter.mv.baseValue);
-            hasMoved = true;
+
+            battleScript.Moved();
+            //battleScript.EndMoveUnit(myCharacter.gridPosition);
+            
+            //battleScript.MoveUnit(newPosition);
         }
 
         currentTile = currentGrid.GetTileAtPos(myCharacter.gridPosition);
@@ -84,8 +86,10 @@ public class EnemyAIController
             Vector2Int targetPos = abilityToUse.c.gridPosition;
 
             // Call battle engine to perform action
-            battleScript.ActUnit(targetPos, false);
+            battleScript.ActUnit(targetPos);
         }
+
+        battleScript.Acted();
     }
 
     private ValidTarget SelectAbilityAndTarget()
@@ -116,7 +120,7 @@ public class EnemyAIController
         }
         else
         {
-            Debug.Log("Cannot find any valid targets!");
+            Debug.Log("Cannot find any valid targets! (retuning null)");
         }
 
         return targetToReturn;

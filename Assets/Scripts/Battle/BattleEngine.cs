@@ -705,39 +705,97 @@ public class BattleEngine : MonoBehaviour
     }
 
     //Try to use the selected ability at the specified position on the grid. Returns true if action succeeds. Will not affect game state if simulate is true.
-    public bool ActUnit(Vector2Int tilePos, bool simulate) 
+    public bool ActUnit(Vector2Int tilePos, bool simulate = false) 
     {
+        // Get scripts + vars
+        Character  activeCharScript = activeUnit.GetComponent<Character>();
+        Grid       gridTiles = grid.GetComponent<Grid>();
+        TileScript tileScript = gridTiles.GetTileAtPos(tilePos).GetComponent<TileScript>();
+        GameObject selectedCharacter = null;
+        
+
         Debug.Log("Moving: " + moving.ToString()
         + " || Acted: " + acted.ToString()
         + " || Selected Ability: " + selectedAbility.displayName 
         + " || activeUnit AP: " + activeUnit.GetComponent<Character>().ap
         + " || Selected Ability Cost: " + selectedAbility.costAP);
 
-        if(moving || acted || selectedAbility == null || activeUnit.GetComponent<Character>().ap < selectedAbility.costAP)
+        // ------- Perform Checks -------
+        /*
+        if (moving)
         {
+            Debug.Log("ActUnit: Error! Cannot act while moving")
             return false;
         }
-        
-        var gridTiles = grid.GetComponent<Grid>();
-        var tileScript = gridTiles.GetTileAtPos(tilePos).GetComponent<TileScript>();
-        int dist = Mathf.Abs(activeUnitPos.x - tilePos.x) + Mathf.Abs(activeUnitPos.y - tilePos.y); //Take Manhattan distance
-        if(dist > selectedAbility.range) return false;
-        Debug.Log("Past Manhattan distance");
-        GameObject selectedCharacter = null;
+        */
+
+        if (acted)
+        {
+            Debug.Log("ActUnit: Error! Active character has already acted");
+            return false;
+        }
+
+        if (selectedAbility == null)
+        {
+            Debug.Log("ActUnit: Error! No ability selected");
+            return false;
+        }
+
+        if (activeCharScript.ap < selectedAbility.costAP)
+        {
+            Debug.Log("ActUnit: Error! Active character doesn't have enough AP for this ability");
+            return false;
+        }
+
+        // Calculate manhattan distance
+        int dist = Mathf.Abs(activeUnitPos.x - tilePos.x) + Mathf.Abs(activeUnitPos.y - tilePos.y);
+
+        // Test whether calculated distance exceeds ability range
+        if(dist > selectedAbility.range)
+        {
+            Debug.Log("ActUnit: Error! Ability out of range");
+            //return false;
+        }
+
         if(selectedAbility.requiresTarget) 
         { 
-            Debug.Log("Selected Target Check");
+            Debug.Log("ActUnit: Ability requires a target, perform validity check");
+            
             //Check for valid target
-            if(!tileScript.hasCharacter) return false;
-            if(selectedAbility.friendly && !AllianceChecker(gridTiles.GetCharacterAtPos(tilePos))) return false;
-            if(!selectedAbility.friendly && AllianceChecker(gridTiles.GetCharacterAtPos(tilePos))) return false;
+            if(!tileScript.hasCharacter)
+            {
+                Debug.Log("ActUnit: Error! There's no character at the targeted grid position");
+                return false; 
+            }
+
+            if(selectedAbility.friendly && !AllianceChecker(gridTiles.GetCharacterAtPos(tilePos)))
+            {
+                Debug.Log("ActUnit: Error! Friendly targeted abilities cannot target enemies");
+                return false;
+            }
+
+            if(!selectedAbility.friendly && AllianceChecker(gridTiles.GetCharacterAtPos(tilePos)))
+            {
+                Debug.Log("ActUnit: Error! Enemy target abilites cannot target allies");
+                return false;
+            }
+
+            // Get the targeted character for selected ability
             selectedCharacter = tileScript.characterOn;
         }
-        if(simulate) return true;
+        // ------------------------------
+
+        // Return here if simulated
+        if(simulate)
+        {
+            Debug.Log("ActUnit: Simulate is true, so we'll return here");
+            return true;
+        }
 
         int xDist = activeUnitPos.x - tilePos.x;
         int yDist = activeUnitPos.y - tilePos.y;
         List<GameObject> characters = new List<GameObject>();
+
         //Select characters based on ability shape
         foreach(Vector2Int pos in selectedAbility.GetRelativeShape(xDist, yDist))
         {
@@ -754,7 +812,7 @@ public class BattleEngine : MonoBehaviour
         }
 
         if(!selectedAbility.free) acted = true;
-        activeUnit.GetComponent<Character>().AddAP(-selectedAbility.costAP);
+        activeCharScript.AddAP(-selectedAbility.costAP);
         usedAbilities.Add(selectedAbility);
 
         StartCoroutine(EndActUnit(selectedCharacter == null ? tilePos : selectedCharacter.GetComponent<Character>().gridPosition, characters, xDist, yDist));
@@ -862,7 +920,7 @@ public class BattleEngine : MonoBehaviour
     }
 
     //Try to move the unit to the specified position on the grid. Returns true if move succeeds. Will not affect game state if simulate is true.
-    public bool MoveUnit(Vector2Int tilePos, bool simulate) 
+    public bool MoveUnit(Vector2Int tilePos, bool simulate = false) 
     {
         var gridTiles = grid.GetComponent<Grid>();
         if(!moved && moving && charSelected && activeUnit == gridTiles.GetCharacterAtPos(selectedCharPos) && tilePos != selectedCharPos) 
@@ -1217,6 +1275,14 @@ public class BattleEngine : MonoBehaviour
 
     public bool HasActed() {
         return acted;
+    }
+
+    public void Moved() {
+        moved = true;
+    }
+
+    public void Acted() {
+        acted = true;
     }
 
     public void SelectAbility(Ability abilityToSelect)
