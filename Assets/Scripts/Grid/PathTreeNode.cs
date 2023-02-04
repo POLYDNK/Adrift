@@ -22,6 +22,9 @@ public class PathTreeNode
     // Self and child tiles as a list
     private List<GameObject> allTiles = null;
 
+    // Units that are either on this tile or on child tiles
+    private List<Character> allUnits = null;
+
     // Constructors
     public PathTreeNode() {}
     public PathTreeNode(PathTreeNode p, GameObject t, int range)
@@ -99,16 +102,27 @@ public class PathTreeNode
         allTiles = new List<GameObject>();
 
         // Call a helper function to populate the list
-        PathTreePreOrder(this);
-
-        //Debug.Log("PathTreeNode: returning a list with " + allTiles.Count + " in it");
+        PathTreePreOrderTiles(this);
 
         // Return the populated list
         return allTiles;
     }
 
+    // Get all units below this node, including this one, as a list
+    public List<Character> GetAllUnits()
+    {
+        // Create a new list
+        allUnits = new List<Character>();
+
+        // Call a helper function to populate the list
+        PathTreePreOrderUnits(this);
+
+        // Return the populated list
+        return allUnits;
+    }
+
     // Helper recursive function to populate the all tiles list
-    private void PathTreePreOrder(PathTreeNode currNode)
+    private void PathTreePreOrderTiles(PathTreeNode currNode)
     {
         // Put the tile object of the current node onto the list
         if (allTiles.Contains(currNode.MyTile) == false)
@@ -117,10 +131,36 @@ public class PathTreeNode
         }
 
         // Visit the Up, Down, Left, and Right nodes if able
-        if (currNode.Up != null)    { PathTreePreOrder(currNode.Up);    }
-        if (currNode.Down != null)  { PathTreePreOrder(currNode.Down);  }
-        if (currNode.Left != null)  { PathTreePreOrder(currNode.Left);  }
-        if (currNode.Right != null) { PathTreePreOrder(currNode.Right); }
+        if (currNode.Up != null)    { PathTreePreOrderTiles(currNode.Up);    }
+        if (currNode.Down != null)  { PathTreePreOrderTiles(currNode.Down);  }
+        if (currNode.Left != null)  { PathTreePreOrderTiles(currNode.Left);  }
+        if (currNode.Right != null) { PathTreePreOrderTiles(currNode.Right); }
+    }
+
+    // Helper recursive function to populate the all units list
+    private void PathTreePreOrderUnits(PathTreeNode currNode)
+    {
+        Character charOnTile = null;
+        TileScript myTileScript = currNode.MyTile.GetComponent<TileScript>();
+
+        // Get character on tile if able
+        if (myTileScript.characterOn != null)
+        {
+            charOnTile = myTileScript.characterOn.GetComponent<Character>();
+        }
+
+        // Add the character to the list if it's not
+        // already in it
+        if (allUnits.Contains(charOnTile) == false)
+        {
+            allUnits.Add(charOnTile);
+        }
+
+        // Visit the Up, Down, Left, and Right nodes if able
+        if (currNode.Up != null)    { PathTreePreOrderUnits(currNode.Up);    }
+        if (currNode.Down != null)  { PathTreePreOrderUnits(currNode.Down);  }
+        if (currNode.Left != null)  { PathTreePreOrderUnits(currNode.Left);  }
+        if (currNode.Right != null) { PathTreePreOrderUnits(currNode.Right); }
     }
 
     // Puts a path of nodes, to the root, onto a stack

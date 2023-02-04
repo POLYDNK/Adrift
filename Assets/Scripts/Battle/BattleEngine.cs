@@ -1219,6 +1219,11 @@ public class BattleEngine : MonoBehaviour
         return acted;
     }
 
+    public void SelectAbility(Ability abilityToSelect)
+    {
+        selectedAbility = abilityToSelect;
+    }
+
     public void DoAITurn() 
     {
         Debug.Log("doAITurn: AI Turn began");
