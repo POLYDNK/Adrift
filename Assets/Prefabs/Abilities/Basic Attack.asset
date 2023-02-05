@@ -15,11 +15,9 @@ MonoBehaviour:
   friendly: 0
   requiresTarget: 1
   free: 0
-  abilityPower: 60
-  singleTarget: 1
-  baseDMG: 50
-  baseHP: 0
-  baseACC: 80
+  baseDmg: 50
+  baseHp: 0
+  baseAcc: 80
   costAP: 0
   range: 1
   knockback: 0

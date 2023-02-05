@@ -17,12 +17,23 @@ public class EnemyAIController
     private GameObject currentTile;
     private List<ValidTarget> validTargets = null;
 
+    // --------------------------------------------------------------
+    // @desc: Default constructor
+    // @arg: be - Reference to the battle engine script
+    // --------------------------------------------------------------
     public EnemyAIController(BattleEngine be)
     {
         // Get battle engine script
         battleScript = be;
     }
 
+    // --------------------------------------------------------------
+    // @desc: Default constructor
+    // @arg: character - The currently active character to take a turn
+    // @arg: moveTime  - Wait time after moving
+    // @arg: endTime   - Wait time after acting
+    // @ret: IEnumerator - Used to enable waiting/yielding functionality
+    // --------------------------------------------------------------
     public IEnumerator PerformTurn(Character character, float moveTime, float endTime)
     {
         // Setup
@@ -45,6 +56,10 @@ public class EnemyAIController
         yield return new WaitForSecondsRealtime(endTime);
     }
 
+    // --------------------------------------------------------------
+    // @desc: Moves a character towards the tile with the highest generated
+    // heat value provided by the HeatmapGenerator class
+    // --------------------------------------------------------------
     private void Move()
     {
         // Generate Heatmap
@@ -73,6 +88,9 @@ public class EnemyAIController
         //Debug.Log("moveToBestTile: moving to tile " + targetTile.GetComponent<TileScript>().position.ToString());
     }
 
+    // --------------------------------------------------------------
+    // @desc: Attempts to perform an action
+    // --------------------------------------------------------------
     private void PerformAction()
     {
         ValidTarget abilityToUse = SelectAbilityAndTarget();
@@ -87,11 +105,23 @@ public class EnemyAIController
 
             // Call battle engine to perform action
             battleScript.ActUnit(targetPos);
-        }
 
-        battleScript.Acted();
+            // Set acted in the battle engine
+            battleScript.Acted();
+        }
+        else
+        {
+            // If the AI cannot find a valid action, then end turn
+            battleScript.EndTurn();
+        }
     }
 
+    // --------------------------------------------------------------
+    // @desc: Goes through each valid target for each abilty - and then
+    // selects the character/ability pair with the highest score
+    // @ret: ValidTarget - A class that contains a valid target and 
+    // an ability to target it with
+    // --------------------------------------------------------------
     private ValidTarget SelectAbilityAndTarget()
     {
         ValidTarget targetToReturn = null;
@@ -105,18 +135,25 @@ public class EnemyAIController
         {
             // If the power attribute is highest, then
             // we'll select this target, instead
-            if (target.power > int.MinValue)
+            if (target.power > highScore)
             {
                 targetToReturn = target;
             }
         }
+
+        /*
+        System.Random random = new System.Random();
+        int index = random.Next(validTargets.Count);
+        targetToReturn = validTargets[index];
+        */
 
         if (targetToReturn != null)
         {
             Debug.Log("Selected ability "
                 + targetToReturn.a.displayName
                 + " to target "
-                + targetToReturn.c.displayName);
+                + targetToReturn.c.displayName
+                + "(power:" + targetToReturn.power + ")");
         }
         else
         {
@@ -126,6 +163,10 @@ public class EnemyAIController
         return targetToReturn;
     }
 
+    // --------------------------------------------------------------
+    // @desc: Populates the validTargets array with every target/ability
+    // pair that the active character has
+    // --------------------------------------------------------------
     private void GetAllValidTargets()
     {
         // Create list of valid targets
@@ -138,6 +179,10 @@ public class EnemyAIController
         }
     }
 
+    // --------------------------------------------------------------
+    // @desc: Gets every valid target that a single ability can target
+    // and then adds them to the list of valid targets
+    // --------------------------------------------------------------
     private void GetTargetsForSingleAbility(Ability ability)
     {
         // Get data from ability
@@ -157,7 +202,7 @@ public class EnemyAIController
             if (_char != null )
             {
                 // Determine whether char is a valid target
-                if (ability.friendly == IsAlly(myCharacter, _char))
+                if (IsValidTarget(ability, _char))
                 {
                     ValidTarget newTarget = new ValidTarget(ability, _char);
                     Debug.Log(newTarget.ToString());
@@ -169,7 +214,29 @@ public class EnemyAIController
         }
     }
 
-    // Helper function to determine allies and enemys
+    private bool IsValidTarget(Ability a, Character target)
+    {
+        bool isValidTarget = false;
+
+        // Alliance check
+        if (a.friendly == IsAlly(myCharacter, target))
+        {
+            // AP Check
+            if (myCharacter.ap >= a.costAP)
+            {
+                isValidTarget = true;
+            }
+        }
+
+        return isValidTarget;
+    }
+
+    // --------------------------------------------------------------
+    // @desc: Helper function to determine allies and enemys
+    // @arg: charA - character to compare against
+    // @arg: charB
+    // @arg: Whether charA and charB are on the same team/crew
+    // --------------------------------------------------------------
     public static bool IsAlly(Character charA, Character charB)
     {
         // Compare the alliance of self and other and then return it

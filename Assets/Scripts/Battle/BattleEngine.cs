@@ -747,14 +747,20 @@ public class BattleEngine : MonoBehaviour
             return false;
         }
 
-        // Calculate manhattan distance
-        int dist = Mathf.Abs(activeUnitPos.x - tilePos.x) + Mathf.Abs(activeUnitPos.y - tilePos.y);
+        // Calculate manhattan distance.
+        int xDist = activeCharScript.gridPosition.x - tilePos.x;
+        int yDist = activeCharScript.gridPosition.y - tilePos.y;
+        int dist = Mathf.Abs(xDist) + Mathf.Abs(yDist);
 
         // Test whether calculated distance exceeds ability range
         if(dist > selectedAbility.range)
         {
-            Debug.Log("ActUnit: Error! Ability out of range");
-            //return false;
+            Debug.Log("ActUnit: Error! Target tile is "
+                + dist.ToString()
+                + " tiles away - which exceeds the ability range of "
+                + selectedAbility.range.ToString()
+                + " tiles.");
+            return false;
         }
 
         if(selectedAbility.requiresTarget) 
@@ -792,8 +798,6 @@ public class BattleEngine : MonoBehaviour
             return true;
         }
 
-        int xDist = activeUnitPos.x - tilePos.x;
-        int yDist = activeUnitPos.y - tilePos.y;
         List<GameObject> characters = new List<GameObject>();
 
         //Select characters based on ability shape
