@@ -506,17 +506,17 @@ public class Grid : MonoBehaviour
                     List<PathTreeNode> pathTowardsDest = destTileScript.PathRef.PathToRootList();
 
                     // Cut down stack to max range
-                    while (pathTowardsDest.Count-1 > maxRange)
+                    while (pathTowardsDest.Count-1 > maxRange || destTileScript.hasCharacter)
                     {
                         pathTowardsDest.RemoveAt(0);
+
+                        // Destination tile is the first element in the list
+                        destTile = pathTowardsDest[0].MyTile;
+
+                        // Get the data from the new destination tile
+                        destTileScript = destTile.GetComponent<TileScript>();
                     }
-
-                    // Destination tile is the first element in the list
-                    destTile = pathTowardsDest[0].MyTile;
-
-                    // Get the data from the new destination tile
-                    destTileScript = destTile.GetComponent<TileScript>();
-
+                    
                     // Move character to the new destination, instead
                     destTileScript.PathRef.PathToRootOnStack(charToMove.GetComponent<FollowPath>().PathToFollow);
 

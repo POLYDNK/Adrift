@@ -16,6 +16,7 @@ public class EnemyAIController
     private Grid currentGrid;
     private GameObject currentTile;
     private List<ValidTarget> validTargets = null;
+    private float timer;
 
     // --------------------------------------------------------------
     // @desc: Default constructor
@@ -98,10 +99,10 @@ public class EnemyAIController
         if (abilityToUse != null)
         {
             // Set ability to use
-            battleScript.SelectAbility(abilityToUse.a);
+            battleScript.SelectAbility(abilityToUse.GetAbility());
 
             // Get pos of target
-            Vector2Int targetPos = abilityToUse.c.gridPosition;
+            Vector2Int targetPos = abilityToUse.GetTarget().gridPosition;
 
             // Call battle engine to perform action
             battleScript.ActUnit(targetPos);
@@ -127,6 +128,10 @@ public class EnemyAIController
         ValidTarget targetToReturn = null;
         int highScore = int.MinValue;
 
+        // Time logging
+        timer = Time.time;
+        Debug.Log("SelectAbilityAndTarget: Looking for best target...");
+
         // Get valid targets
         GetAllValidTargets();
 
@@ -137,11 +142,15 @@ public class EnemyAIController
             // we'll select this target, instead
             if (target.power > highScore)
             {
+                // Set new valid target
                 targetToReturn = target;
+
+                // Set new highscore
+                highScore = target.power;
             }
         }
 
-        /*
+        /* **** Random targeting ****
         System.Random random = new System.Random();
         int index = random.Next(validTargets.Count);
         targetToReturn = validTargets[index];
@@ -150,15 +159,17 @@ public class EnemyAIController
         if (targetToReturn != null)
         {
             Debug.Log("Selected ability "
-                + targetToReturn.a.displayName
+                + targetToReturn.GetAbility().displayName
                 + " to target "
-                + targetToReturn.c.displayName
+                + targetToReturn.GetTarget().displayName
                 + "(power:" + targetToReturn.power + ")");
         }
         else
         {
             Debug.Log("Cannot find any valid targets! (retuning null)");
         }
+
+        Debug.Log("SelectAbilityAndTarget: Completed target search (time elapsed: " + (Time.time-timer).ToString() + "s)");
 
         return targetToReturn;
     }
@@ -192,19 +203,19 @@ public class EnemyAIController
 
         // Get units within range of the ability
         PathTreeNode tilesInRange = currentGrid.GetAllPathsFromTile(currentTile, searchRange, true);
-        List<Character> chars = tilesInRange.GetAllUnits();
+        List<Character> targets = tilesInRange.GetAllUnits();
         
-        Debug.Log("Number of units in range: " + chars.Count.ToString());
+        Debug.Log("Number of units in range: " + targets.Count.ToString());
 
         // Do this for each character
-        foreach (Character _char in chars)
+        foreach (Character target in targets)
         {
-            if (_char != null )
+            if (target != null )
             {
                 // Determine whether char is a valid target
-                if (IsValidTarget(ability, _char))
+                if (IsValidTarget(ability, target))
                 {
-                    ValidTarget newTarget = new ValidTarget(ability, _char);
+                    ValidTarget newTarget = new ValidTarget(ability, myCharacter, target);
                     Debug.Log(newTarget.ToString());
 
                     // If so, then add a new valid target to the list
@@ -245,20 +256,32 @@ public class EnemyAIController
 
     protected internal class ValidTarget
     {
-        public Ability a = null;
-        public Character c = null;
+        private Ability ability = null;
+        private Character caster = null;
+        private Character target = null;
         public int power = int.MinValue;
 
-        public ValidTarget(Ability _ability, Character _char)
+        public ValidTarget(Ability _ability, Character caster, Character target)
         {
-            a = _ability;
-            c = _char;
-            power = _ability.baseDmg + _ability.baseHp;
+            ability = _ability;
+            this.caster = caster;
+            this.target = target;
+            power = HeatmapGenerator.abilityImpact(_ability, caster, target);
         }
 
         public string ToString()
         {
-            return c.displayName + " can be targeted by the ability " + a.displayName;
+            return caster.displayName + " can be targeted by the ability " + ability.displayName;
+        }
+
+        public Character GetTarget()
+        {
+            return target;
+        }
+
+        public Ability GetAbility()
+        {
+            return ability;
         }
     }
 }

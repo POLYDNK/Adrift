@@ -11,9 +11,13 @@ public static class HeatmapGenerator
     private static TileScript activeTile;
     private static TileScript bestTile;
     private static int highScore;
+    private static float timer;
 
     public static void GenerateHeatmap(List<GameObject> allUnits, GameObject activeUnit)
     {
+        timer = Time.time;
+        Debug.Log("GenerateHeatmap: Generating heatmap...");
+
         // Reset
         bestTile = null;
         highScore = int.MinValue;
@@ -45,6 +49,8 @@ public static class HeatmapGenerator
         // Generate extra heat for tiles the active char can move to
         currentGrid = activeChar.myGrid.GetComponent<Grid>();
         MovementHeat(20);
+
+        Debug.Log("GenerateHeatmap: Heatmap generated (time elapsed: " + (Time.time-timer).ToString() + "s)");
     }
 
     // Reset the heat value of all tiles to 0
@@ -73,7 +79,6 @@ public static class HeatmapGenerator
     {
         // Get data from ability
         int searchRange = ability.range;
-        int power = ability.baseDmg + ability.baseHp;
 
         // Include enemy checking here plzzz
         if (ability.friendly == IsAlly(charScript))
@@ -93,7 +98,7 @@ public static class HeatmapGenerator
                 {
                     // Since the active character can use an ability from this square,
                     // we'll increase the heat of this tile
-                    tileScript.heatVal += power;
+                    tileScript.heatVal += abilityImpact(ability, activeChar, charScript);
 
                     // Check whether the high score is beaten
                     if (tileScript.heatVal > highScore)
@@ -118,16 +123,21 @@ public static class HeatmapGenerator
         {
             // Get tile script
             TileScript tileScript = tile.GetComponent<TileScript>();
-
-            // Since the active character can move to this tile,
-            // we'll increase the heat of this tile
-            tileScript.heatVal += moveWeight;
-
-            // Check whether the high score is beaten
-            if (tileScript.heatVal > highScore)
+            
+            // Check if there isn't a character on this tile already
+            // (not moving gets this bonus, too)
+            if (tileScript.hasCharacter == false || tileScript.position == activeTile.position)
             {
-                highScore = tileScript.heatVal;
-                bestTile = tileScript;
+                // Since the active character can move to this tile,
+                // we'll increase the heat of this tile
+                tileScript.heatVal += moveWeight;
+
+                // Check whether the high score is beaten
+                if (tileScript.heatVal > highScore)
+                {
+                    highScore = tileScript.heatVal;
+                    bestTile = tileScript;
+                }
             }
         }
     }
@@ -145,4 +155,31 @@ public static class HeatmapGenerator
 
         return bestTile;
     }
-}
+
+    // Get ability impact
+    public static int abilityImpact(Ability a, Character caster, Character target)
+    {
+        int totalImpact = 0;
+        int killBonus = 50;
+
+        // Damage
+        int damage = a.baseDmg * a.totalHits + caster.atk;
+        totalImpact += damage;
+
+        // Healing
+        int healing = Mathf.Max((a.baseHp + target.GetLuck()), (target.hpmax.baseValue - target.hp));
+        healing *= a.totalHits;
+        totalImpact += healing;
+
+        // Would kill bonus
+        if (damage > target.hp)
+        {
+            totalImpact += killBonus;
+        }
+
+        // Accuracy bonus
+        //totalImpact += a.baseAcc;
+
+        return totalImpact;
+    }
+}   
