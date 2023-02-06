@@ -6925,7 +6925,7 @@ MonoBehaviour:
   minHeight: 5
   maxHeight: 100
   objectFollowing: {fileID: 0}
-  debugMode: 1
+  debugMode: 0
 --- !u!82 &2054579721
 AudioSource:
   m_ObjectHideFlags: 0

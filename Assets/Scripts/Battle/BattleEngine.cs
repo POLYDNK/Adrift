@@ -278,7 +278,7 @@ public class BattleEngine : MonoBehaviour
                                 }
                             }
                             else if(!moving && !acted) { //Acting
-                                if(charHighlighted && highlightedCharPos != tilePos) {
+                                if(charHighlighted && highlightedCharPos != tilePos && selectedAbility != null) {
                                     foreach(GameObject selTile in gridTiles.GetAllTiles()) {
                                         var selPos = selTile.GetComponent<TileScript>().position;
                                         if(selPos != activeUnitPos && selTile.GetComponent<TileScript>().passable) selTile.GetComponent<Renderer>().material = IsTileActive(selPos) ? gridTiles.activeUnselected : (Mathf.Abs(activeUnitPos.x - selPos.x) + Mathf.Abs(activeUnitPos.y - selPos.y) > selectedAbility.range ? gridTiles.unselected : gridTiles.abilityHighlighted);
@@ -564,13 +564,15 @@ public class BattleEngine : MonoBehaviour
 
         if(!isPlayerTurn)
         {
+            // Heatmap Generation
+            HeatmapGenerator.GenerateHeatmap(aliveUnits, activeUnit);
             SelectCoin(actionCoin, actionCoinAnimator, false);
             SelectCoin(moveCoin, moveCoinAnimator, false);
             SelectCoin(endCoin, endCoinAnimator, false);
             SelectCoin(surrenderCoin, surrenderCoinAnimator, false);
             DoAITurn();
         }
-        else 
+        else
         {
             SelectCoin(actionCoin, actionCoinAnimator, false);
             SelectCoin(moveCoin, moveCoinAnimator, true);
@@ -579,9 +581,6 @@ public class BattleEngine : MonoBehaviour
             RefreshActionButtons();
             SelectMove(); //Default to move (generally units move before acting)
         }
-
-        // Heatmap Generation
-        HeatmapGenerator.GenerateHeatmap(aliveUnits, activeUnit);
     }
 
     //End the active unit's turn
