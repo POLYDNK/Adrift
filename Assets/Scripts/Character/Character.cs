@@ -329,10 +329,10 @@ public class Character : MonoBehaviour
         if(weapon != null) {
             weapon.ApplyModifiers(this);
             //Remove the old model first
-            Transform oldModel = RecursiveFind(this.transform, WeaponModel);
-            if(oldModel != null) GameObject.Destroy(oldModel.gameObject);
+            Transform oldModel = DataUtil.RecursiveFind(this.transform, WeaponModel);
+            if(oldModel != null) Destroy(oldModel.gameObject);
             //Instantiate the new weapon and parent it to the right hand's attachment point for objects
-            GameObject newModel = Instantiate(weapon.model, RecursiveFind(this.transform, "Object.R"));
+            GameObject newModel = Instantiate(weapon.model, DataUtil.RecursiveFind(this.transform, "Object.R"));
             newModel.transform.Rotate(-90f, 0f, 0f, Space.Self); //Set up rotations (this should be done in the prefab if more stuff is used here besides swords)
         }
         if(hat != null) hat.ApplyModifiers(this);
@@ -347,27 +347,6 @@ public class Character : MonoBehaviour
         hit = GetHit(null, true);
         crit = GetCrit(null, true);
         atk = GetAtk(null, true);
-    }
-
-
-
-    public static Transform RecursiveFind(Transform parent, string childName) {
-        foreach (Transform child in parent)
-        {
-            if(child.name == childName)
-            {
-                return child;
-            }
-            else
-            {
-                Transform found = RecursiveFind(child, childName);
-                if (found != null)
-                {
-                        return found;
-                }
-            }
-        }
-        return null;
     }
 
     // HP changed (either taking damage (negative) or healing (positive))

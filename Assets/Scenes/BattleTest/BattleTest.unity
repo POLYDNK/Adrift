@@ -1383,8 +1383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonPrefab: {fileID: 4464714910523592307, guid: 36405b12318cf574799abcac07964ffc, type: 3}
-  grids:
-  - {fileID: 0}
+  boardableGrids: []
   playerCrew: {fileID: 8677408311475748420, guid: 238bccab6e5fb4a449c65233d85a8160, type: 3}
   enemyCrew: {fileID: 8677408311475748420, guid: ff7e742bfec002a4c80690599f895dce, type: 3}
   playerShip: {fileID: 1224612646}
@@ -1400,7 +1399,7 @@ MonoBehaviour:
   isPlayerTurn: 0
   activeUnit: {fileID: 0}
   activeUnitTile: {fileID: 0}
-  grid: {fileID: 0}
+  activeGrid: {fileID: 0}
   activeUnitPos: {x: 0, y: 0}
   aliveUnits: []
   deadUnits: []
@@ -2641,7 +2640,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9036149285931199850, guid: a3e6463538b16bd43a2ee13c9e1eff61, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 9036149285931199850, guid: a3e6463538b16bd43a2ee13c9e1eff61, type: 3}
       propertyPath: m_LocalRotation.w

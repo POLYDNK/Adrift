@@ -117,7 +117,7 @@ public class CannonUI : MonoBehaviour
             Debug.Log("Searching for cannon at " + activePos.ToString());
 
             activePos = battleScript.activeUnitPos;
-            grid = battleScript.grid;
+            grid = battleScript.activeGrid.gameObject;
             var gridScript = grid.GetComponent<Grid>();
         
             if (CheckIfCannon(gridScript.GetTileNorth(activePos)))

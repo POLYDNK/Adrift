@@ -94,6 +94,7 @@ public class Grid : MonoBehaviour
                 newTileScript.position.x = x;
                 newTileScript.position.y = y;
                 newTileScript.myLayer = gridLayer;
+                newTileScript.grid = this;
 
                 // Check the grid map for impassible tiles
                 if (passableTiles.GetFlagAtPos(xy))

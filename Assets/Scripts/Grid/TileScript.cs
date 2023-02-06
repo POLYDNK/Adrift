@@ -13,6 +13,7 @@ public class TileScript : MonoBehaviour
     [SerializeField] public Vector2Int position;
 
     // Game object references
+    public Grid grid;
     public GameObject characterOn = null;
     public GameObject objectOn = null;
     public Grid targetGrid = null;
