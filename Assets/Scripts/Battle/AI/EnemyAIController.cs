@@ -50,13 +50,13 @@ public class EnemyAIController
         await Task.Delay(200);
         
         // Move
-        Move();
+        await Move();
 
         // Move time
         await Task.Delay(moveTime);
 
         // Act
-        PerformAction();
+        await PerformAction();
 
         // End time
         await Task.Delay(endTime);
