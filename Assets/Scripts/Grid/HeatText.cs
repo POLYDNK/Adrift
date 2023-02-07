@@ -12,7 +12,7 @@ using TMPro;
 public class HeatText : MonoBehaviour
 {
     // Public vars
-    [SerializeField] public TileScript myTile;
+    [SerializeField] public Tile myTile;
     [SerializeField] public TMP_Text floatingText;
 
     // Update is called once per frame

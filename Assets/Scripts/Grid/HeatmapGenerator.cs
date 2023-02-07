@@ -8,8 +8,8 @@ public static class HeatmapGenerator
     private static Grid currentGrid;
     private static Character activeChar;
     private static GameObject activeTileObj;
-    private static TileScript activeTile;
-    private static TileScript bestTile;
+    private static Tile activeTile;
+    private static Tile bestTile;
     private static int highScore;
     private static float timer;
 
@@ -26,7 +26,7 @@ public static class HeatmapGenerator
         // Get active char script
         activeChar = activeUnit.GetComponent<Character>();
         activeTileObj = activeChar.myGrid.GetComponent<Grid>().GetTileAtPos(activeChar.gridPosition);
-        activeTile = activeTileObj.GetComponent<TileScript>();
+        activeTile = activeTileObj.GetComponent<Tile>();
 
         // Generate heat around the tiles of all units based on what
         // abilities the active character can use
@@ -63,7 +63,7 @@ public static class HeatmapGenerator
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Tile");
         foreach (GameObject tile in objects)
         {
-            tile.GetComponent<TileScript>().heatVal = 0;
+            tile.GetComponent<Tile>().heatVal = 0;
         }
     }
 
@@ -94,7 +94,7 @@ public static class HeatmapGenerator
             // Do this for every tile within range of the ability
             foreach (GameObject tile in tiles)
             {
-                TileScript tileScript = tile.GetComponent<TileScript>();
+                Tile tileScript = tile.GetComponent<Tile>();
 
                 // If the tile doesn't have a character on it
                 if (tileScript.hasCharacter == false || pos == activeTile.position)
@@ -124,7 +124,7 @@ public static class HeatmapGenerator
         foreach (GameObject tile in tiles)
         {
             // Get tile script
-            TileScript tileScript = tile.GetComponent<TileScript>();
+            Tile tileScript = tile.GetComponent<Tile>();
             
             // Check if there isn't a character on this tile already
             // (not moving gets this bonus, too)
@@ -166,7 +166,7 @@ public static class HeatmapGenerator
             foreach (GameObject tile in tiles)
             {
                 // Get tile script
-                TileScript tileScript = tile.GetComponent<TileScript>();
+                Tile tileScript = tile.GetComponent<Tile>();
 
                 // Increase heat
                 tileScript.heatVal += cannonHeat;
@@ -188,7 +188,7 @@ public static class HeatmapGenerator
         return activeChar.IsPlayer() == charScript.IsPlayer();
     }
 
-    public static TileScript GetBestTile()
+    public static Tile GetBestTile()
     {
         Debug.Log("HeatmapGenerator: the best tile has a score of " + highScore.ToString());
 

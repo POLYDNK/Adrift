@@ -198,7 +198,7 @@ public class CameraController : MonoBehaviour
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Tile");
         foreach (GameObject tile in objects)
         {
-            var tileScript = tile.GetComponent<TileScript>();
+            var tileScript = tile.GetComponent<Tile>();
 
             if ((Layermode)tileScript.myLayer >= lm)
             {

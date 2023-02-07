@@ -31,7 +31,7 @@ public class PathTreeNode
     {
         Parent = p;
         MyTile = t;
-        MyTile.GetComponent<TileScript>().PathRef = this;
+        MyTile.GetComponent<Tile>().PathRef = this;
         TileRange = range;
     }
 
@@ -141,7 +141,7 @@ public class PathTreeNode
     private void PathTreePreOrderUnits(PathTreeNode currNode)
     {
         Character charOnTile = null;
-        TileScript myTileScript = currNode.MyTile.GetComponent<TileScript>();
+        Tile myTileScript = currNode.MyTile.GetComponent<Tile>();
 
         // Get character on tile if able
         if (myTileScript.characterOn != null)

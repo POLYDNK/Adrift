@@ -281,16 +281,16 @@ public class Character : MonoBehaviour
     // @arg: destTile   - grid tile to move the character to
     // @ret: bool      - whether the move is successful or not
     // --------------------------------------------------------------
-    public bool PathToTile(TileScript destTile, bool onlyHighlighted)
+    public bool PathToTile(Tile destTile, bool onlyHighlighted)
     {
         bool moveSuccess = false;
         
         // Get tile on source position
         GameObject sourceTile = GetTileObject();
-        var sourceTileScript = sourceTile.GetComponent<TileScript>();
+        var sourceTileScript = sourceTile.GetComponent<Tile>();
 
         // Get tile on dest position
-        var destTileScript = destTile.GetComponent<TileScript>();
+        var destTileScript = destTile.GetComponent<Tile>();
         var destPos = destTileScript.position;
 
         // Get character on source tile

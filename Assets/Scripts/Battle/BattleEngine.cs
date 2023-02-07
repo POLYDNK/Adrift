@@ -214,7 +214,7 @@ public class BattleEngine : MonoBehaviour
                         // Get data from tile hit
                         var objectHit   = hit.transform;
                         var selectRend  = objectHit.GetComponent<Renderer>();
-                        var tileScript  = objectHit.GetComponent<TileScript>();
+                        var tileScript  = objectHit.GetComponent<Tile>();
                         Vector2Int tilePos = tileScript.position;
                         int xDist = activeUnitPos.x - tilePos.x;
                         int yDist = activeUnitPos.y - tilePos.y;
@@ -284,8 +284,8 @@ public class BattleEngine : MonoBehaviour
                             else if(!moving && !acted) { //Acting
                                 if(charHighlighted && highlightedCharPos != tilePos && selectedAbility != null) {
                                     foreach(GameObject selTile in activeGrid.GetAllTiles()) {
-                                        var selPos = selTile.GetComponent<TileScript>().position;
-                                        if(selPos != activeUnitPos && selTile.GetComponent<TileScript>().passable) selTile.GetComponent<Renderer>().material = IsTileActive(selPos) ? activeGrid.activeUnselected : (Mathf.Abs(activeUnitPos.x - selPos.x) + Mathf.Abs(activeUnitPos.y - selPos.y) > selectedAbility.range ? activeGrid.unselected : activeGrid.abilityHighlighted);
+                                        var selPos = selTile.GetComponent<Tile>().position;
+                                        if(selPos != activeUnitPos && selTile.GetComponent<Tile>().passable) selTile.GetComponent<Renderer>().material = IsTileActive(selPos) ? activeGrid.activeUnselected : (Mathf.Abs(activeUnitPos.x - selPos.x) + Mathf.Abs(activeUnitPos.y - selPos.y) > selectedAbility.range ? activeGrid.unselected : activeGrid.abilityHighlighted);
                                     }
                                 }
                                 if(selectedAbility != null && tileScript.highlighted && Mathf.Abs(activeUnitPos.x - tilePos.x) + Mathf.Abs(activeUnitPos.y - tilePos.y) <= selectedAbility.range) {
@@ -293,7 +293,7 @@ public class BattleEngine : MonoBehaviour
                                         var selPos = new Vector2Int(tilePos.x + pos.x, tilePos.y + pos.y);
                                         var selTile = activeGrid.GetTileAtPos(selPos);
                                         if(selTile != null) {
-                                            var selTileScript = selTile.GetComponent<TileScript>();
+                                            var selTileScript = selTile.GetComponent<Tile>();
                                             if(selTileScript.passable && selTileScript.characterOn != activeUnit) {
                                                 if(pos.x == 0 && pos.y == 0) {
                                                     highlightedCharPos = selPos;
@@ -369,7 +369,7 @@ public class BattleEngine : MonoBehaviour
                 {
                     // Get data from tile at current pos
                     var currentTile = grid.GetTileAtPos(new Vector2Int(x, y));
-                    var currentTileScript = currentTile.GetComponent<TileScript>();
+                    var currentTileScript = currentTile.GetComponent<Tile>();
 
                     // Check if the tile is highlighted
                     if (currentTileScript.highlighted)
@@ -386,7 +386,7 @@ public class BattleEngine : MonoBehaviour
     }
 
     public void SelectCharacter(GameObject tile) {
-        TileScript tileScript = tile.GetComponent<TileScript>();
+        Tile tileScript = tile.GetComponent<Tile>();
         var tilePos = tileScript.position;
         // If a tile has a character on it, then we can only select it
         if (tileScript.hasCharacter)
@@ -453,7 +453,7 @@ public class BattleEngine : MonoBehaviour
                     var tilePos = new Vector2Int(x, y);
                     var tile = activeGrid.GetTileAtPos(tilePos);
                     if(tile == null) continue;
-                    var tileScript = tile.GetComponent<TileScript>();
+                    var tileScript = tile.GetComponent<Tile>();
                     if(tileScript.passable) {
                         tileScript.highlighted = true;
                         tile.GetComponent<Renderer>().material = IsTileActive(tilePos) ? activeGrid.activeHighlighted : activeGrid.abilityHighlighted;
@@ -480,11 +480,11 @@ public class BattleEngine : MonoBehaviour
     public void HighlightPathTree(PathTreeNode root) {
         // Get data from tile
         var tileRend = root.MyTile.GetComponent<Renderer>();
-        var tileScript = root.MyTile.GetComponent<TileScript>();
+        var tileScript = root.MyTile.GetComponent<Tile>();
         Vector2Int tilePos = tileScript.position;
 
         // Highlight tile
-        tileRend.material = IsTileActive(root.MyTile.GetComponent<TileScript>().grid, tilePos) ? activeGrid.activeHighlighted : activeGrid.highlighted;
+        tileRend.material = IsTileActive(root.MyTile.GetComponent<Tile>().grid, tilePos) ? activeGrid.activeHighlighted : activeGrid.highlighted;
         if(root.Up != null) HighlightPathTree(root.Up);
         if(root.Down != null) HighlightPathTree(root.Down);
         if(root.Left != null) HighlightPathTree(root.Left);
@@ -497,7 +497,7 @@ public class BattleEngine : MonoBehaviour
     }
 
     public bool IsTileActive(Grid grid, Vector2Int tilePos) {
-        return grid.Tiles[tilePos.x, tilePos.y].GetComponent<TileScript>().characterOn == activeUnit;
+        return grid.Tiles[tilePos.x, tilePos.y].GetComponent<Tile>().characterOn == activeUnit;
     }
 
     public void SelectAction() {
@@ -617,7 +617,7 @@ public class BattleEngine : MonoBehaviour
     {
         if (interactable)
         {
-            activeGrid.GetTileAtPos(activeUnitPos).GetComponent<TileScript>().highlighted = false;
+            activeGrid.GetTileAtPos(activeUnitPos).GetComponent<Tile>().highlighted = false;
             activeGrid.GetTileAtPos(activeUnitPos).GetComponent<Renderer>().material = activeGrid.unselected;
             
             // Tick stat modifiers
@@ -692,7 +692,7 @@ public class BattleEngine : MonoBehaviour
     private void SetupActionOrMove(GameObject tile, bool isAction)
     {
         var selectRend  = tile.GetComponent<Renderer>();
-        var tileScript  = tile.GetComponent<TileScript>();
+        var tileScript  = tile.GetComponent<Tile>();
         Vector2Int tilePos = tileScript.position;
 
         // Unselect currently selected character
@@ -734,7 +734,7 @@ public class BattleEngine : MonoBehaviour
     {
         // Get scripts + vars
         Character  activeCharScript = activeUnit.GetComponent<Character>();
-        TileScript tileScript = activeGrid.GetTileAtPos(tilePos).GetComponent<TileScript>();
+        Tile tileScript = activeGrid.GetTileAtPos(tilePos).GetComponent<Tile>();
         GameObject selectedCharacter = null;
 
         // ------- Perform Checks -------
@@ -829,7 +829,7 @@ public class BattleEngine : MonoBehaviour
             Vector2Int selPos = new Vector2Int(tilePos.x + pos.x, tilePos.y + pos.y);
             var selTile = activeGrid.GetTileAtPos(selPos);
             if(selTile == null) continue;
-            var selTileScript = selTile.GetComponent<TileScript>();
+            var selTileScript = selTile.GetComponent<Tile>();
             if(selTileScript.hasCharacter)
             {
                 if(selectedAbility.friendly && !AllianceChecker(activeGrid.GetCharacterAtPos(selPos))) continue;
@@ -900,7 +900,7 @@ public class BattleEngine : MonoBehaviour
 
     //Search for a possible combo attack and try it if not simulated. Returns true if a combo occurs.
     public bool TryComboAttack(Vector2Int userPos, Vector2Int selectedPos, bool simulate) {
-        var tileScript = activeGrid.GetTileAtPos(selectedPos).GetComponent<TileScript>();
+        var tileScript = activeGrid.GetTileAtPos(selectedPos).GetComponent<Tile>();
         int xDist = userPos.x - selectedPos.x;
         int yDist = userPos.y - selectedPos.y;
         if(selectedAbility.requiresTarget && xDist != yDist && selectedAbility.selfMovement == 0) //No diagonals
@@ -923,7 +923,7 @@ public class BattleEngine : MonoBehaviour
     private bool HandleComboAttack(GameObject characterTile, GameObject targetCharacter, bool simulate) {
         if(characterTile != null && targetCharacter != null)
         {
-            TileScript tile = characterTile.GetComponent<TileScript>();
+            Tile tile = characterTile.GetComponent<Tile>();
             Vector2Int targetPos = targetCharacter.GetComponent<Character>().gridPosition;
             if(tile.hasCharacter && IsAllyUnit(tile.characterOn) != IsAllyUnit(targetCharacter) && Mathf.Abs(tile.position.x - targetPos.x) + Mathf.Abs(tile.position.y - targetPos.y) == 1) //Need target on opposite team
             {
@@ -946,7 +946,7 @@ public class BattleEngine : MonoBehaviour
     }
 
     //Try to move the unit to the specified position on the grid. Returns true if move succeeds. Will not affect game state if simulate is true.
-    public bool MoveUnit(TileScript tile, bool simulate = false)
+    public bool MoveUnit(Tile tile, bool simulate = false)
     {
         Vector2Int tilePos = tile.position;
         if(!moved && moving && charSelected && activeUnit == activeGrid.GetCharacterAtPos(selectedCharPos) && tilePos != selectedCharPos) 
@@ -964,7 +964,7 @@ public class BattleEngine : MonoBehaviour
         return false;
     }
 
-    IEnumerator EndMoveUnit(TileScript tile) {
+    IEnumerator EndMoveUnit(Tile tile) {
         // Unselect currently select character
         Debug.Log("Unselecting character on " + selectedCharPos.x + " " + selectedCharPos.y);
         activeUnitPos = tile.position;
@@ -1237,7 +1237,7 @@ public class BattleEngine : MonoBehaviour
         }
 
         //Setup travel button
-        var activeUnitTileScript = activeUnitTile.GetComponent<TileScript>();
+        var activeUnitTileScript = activeUnitTile.GetComponent<Tile>();
         if(activeUnitTileScript.hasGridLink)
         {
             GameObject actionButton = Instantiate(buttonPrefab, canvas.transform);
@@ -1328,14 +1328,14 @@ public class BattleEngine : MonoBehaviour
         int chosenTarget = 0;
 
         //Initialize the target of the AI action variable
-        TileScript actionTarget = null;
+        Tile actionTarget = null;
 
         //Initialize variables based on the current character
         var activeChar = activeUnit.GetComponent<Character>();
         List<Ability> allAbilities = activeChar.GetBattleAbilities();
 
         //This is a list of lists of Vectors, used for storing the positions of possible targets for each ability.
-        List<List<TileScript>> abilityTargetsLists = new List<List<TileScript>>();
+        List<List<Tile>> abilityTargetsLists = new List<List<Tile>>();
 
         // Debug.Log("@@@@Current character class: " + activeChar.classname.ToString() 
         // + " || character at: " + activeUnitTile.GetComponent<TileScript>().position.x + ", " + activeUnitTile.GetComponent<TileScript>().position.y + "@@@@");
@@ -1344,7 +1344,7 @@ public class BattleEngine : MonoBehaviour
         foreach(Ability selectedAbility in allAbilities)
         {
             //This is a temporary list of Vectors, used for storing the results of the targetAcquisitionTree to be added to the abilityTargetsLists lists
-            List<TileScript> tempTiles = new List<TileScript>();
+            List<Tile> tempTiles = new List<Tile>();
 
             PathTreeNode tempPathTree = new PathTreeNode();
 
@@ -1377,7 +1377,7 @@ public class BattleEngine : MonoBehaviour
         }
 
         //Check the list of targets, as there's a possibility the AI has no targets
-        foreach(List<TileScript> subList in abilityTargetsLists)
+        foreach(List<Tile> subList in abilityTargetsLists)
         {
             //If there's at least a single target available for any ability
             if(subList.Count > 0)
@@ -1453,7 +1453,7 @@ public class BattleEngine : MonoBehaviour
         //Log the path to the target
         foreach(PathTreeNode listNode in tempPathList)
         {
-            var tempTileScript = listNode.MyTile.GetComponent<TileScript>();
+            var tempTileScript = listNode.MyTile.GetComponent<Tile>();
 
             logIndex++;
 
@@ -1464,7 +1464,7 @@ public class BattleEngine : MonoBehaviour
         }
 
         //Initialize the TileScript that is directly adjacent to the target, where we will be trying to head towards
-        TileScript adjacentTileScript = tempPathList[1].MyTile.GetComponent<TileScript>();
+        Tile adjacentTileScript = tempPathList[1].MyTile.GetComponent<Tile>();
         Debug.Log("AI: adjacentTileScript: (" + adjacentTileScript.position.x + ", " + adjacentTileScript.position.y + ")");
 
         //Head towards the tile adjacent to the target
@@ -1487,10 +1487,10 @@ public class BattleEngine : MonoBehaviour
         EndTurn();
     }
     
-    public void TargetAcquisitionTree(PathTreeNode root, List<TileScript> returnList, bool validTarget) 
+    public void TargetAcquisitionTree(PathTreeNode root, List<Tile> returnList, bool validTarget) 
     {
         // Get data from tile
-        var tileScript = root.MyTile.GetComponent<TileScript>();
+        var tileScript = root.MyTile.GetComponent<Tile>();
 
         // if(tileScript.characterOn != null)
         // {
@@ -1538,7 +1538,7 @@ public class BattleEngine : MonoBehaviour
         //     return false;
         // }
         
-        var tileScript = activeGrid.GetTileAtPos(tilePos).GetComponent<TileScript>();
+        var tileScript = activeGrid.GetTileAtPos(tilePos).GetComponent<Tile>();
 
         int dist = Mathf.Abs(activeUnitPos.x - tilePos.x) + Mathf.Abs(activeUnitPos.y - tilePos.y); //Take Manhattan distance
 
@@ -1585,7 +1585,7 @@ public class BattleEngine : MonoBehaviour
             Vector2Int selPos = new Vector2Int(tilePos.x + pos.x, tilePos.y + pos.y);
             var selTile = activeGrid.GetTileAtPos(selPos);
             if(selTile == null) continue;
-            var selTileScript = selTile.GetComponent<TileScript>();
+            var selTileScript = selTile.GetComponent<Tile>();
             if(selTileScript.hasCharacter)
             {
                 if(selectedAbility.friendly && !AllianceChecker(activeGrid.GetCharacterAtPos(selPos)))

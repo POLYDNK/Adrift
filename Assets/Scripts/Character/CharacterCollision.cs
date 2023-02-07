@@ -35,7 +35,7 @@ public class CharacterCollision : MonoBehaviour
             // Remove self from current ship
             Vector2Int tilePos = transform.parent.transform.GetComponent<Character>().gridPosition;
             GameObject myTile = transform.parent.transform.GetComponent<Character>().myGrid.GetComponent<Grid>().GetTileAtPos(tilePos);
-            var tileScript = myTile.GetComponent<TileScript>();
+            var tileScript = myTile.GetComponent<Tile>();
             tileScript.characterOn = null;
             tileScript.hasCharacter = false;
 

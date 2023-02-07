@@ -107,7 +107,7 @@ public class Grid : MonoBehaviour
 
                 // Set the data of the newly created tile
                 newTile.name = "Tile " + x + " " + y;
-                var newTileScript = newTile.GetComponent<TileScript>();
+                var newTileScript = newTile.GetComponent<Tile>();
                 newTileScript.position.x = x;
                 newTileScript.position.y = y;
                 newTileScript.myLayer = gridLayer;
@@ -154,7 +154,7 @@ public class Grid : MonoBehaviour
                 spawningTile = Tiles[randX, randY];
 
                 // Get data from tile object
-                var tilesScript = spawningTile.GetComponent<TileScript>();
+                var tilesScript = spawningTile.GetComponent<Tile>();
 
             // Check whether the tile already has a character on it
             // + whether the tile is a passable tile
@@ -217,7 +217,7 @@ public class Grid : MonoBehaviour
         spawningTile = Tiles[spawnPos.x, spawnPos.y];
 
         // Get data from tile object
-        var tilesScript = spawningTile.GetComponent<TileScript>();
+        var tilesScript = spawningTile.GetComponent<Tile>();
 
         // Check whether the tile already has a character on it
         // + whether the tile is a passable tile
@@ -284,7 +284,7 @@ public class Grid : MonoBehaviour
         Debug.Log("Attaching object to position " + gridPos.x + " " + gridPos.y);
 
         // Get data from tile object
-        var tilesScript = tile.GetComponent<TileScript>();
+        var tilesScript = tile.GetComponent<Tile>();
     
         // Check range
         if (TilePosInRange(gridPos))
@@ -332,7 +332,7 @@ public class Grid : MonoBehaviour
 
     public bool RemoveCharacter(GameObject character) {
         Vector2Int tilePos = character.GetComponent<Character>().gridPosition;
-        var tile = GetTileAtPos(tilePos).GetComponent<TileScript>();
+        var tile = GetTileAtPos(tilePos).GetComponent<Tile>();
         if(tile.characterOn == character) {
             character.GetComponent<Character>().RemoveFromGrid();
             tile.characterOn = null;
@@ -351,11 +351,11 @@ public class Grid : MonoBehaviour
         {
             // Get tile on source position
             GameObject sourceTile = Tiles[sourcePos.x, sourcePos.y];
-            var sourceTileScript = sourceTile.GetComponent<TileScript>();
+            var sourceTileScript = sourceTile.GetComponent<Tile>();
 
             // Get tile on dest position
             GameObject destTile = Tiles[destPos.x, destPos.y];
-            var destTileScript = destTile.GetComponent<TileScript>();
+            var destTileScript = destTile.GetComponent<Tile>();
 
             Vector2Int path = new Vector2Int(0, 0);
             if(!sourceTileScript.hasCharacter) return false;
@@ -363,28 +363,28 @@ public class Grid : MonoBehaviour
             int yDist = destPos.y - sourcePos.y;
             if(xDist > 0) {
                 for(int i = 1; i <= xDist; i++) {
-                    var tileScript = Tiles[sourcePos.x + i, sourcePos.y].GetComponent<TileScript>();
+                    var tileScript = Tiles[sourcePos.x + i, sourcePos.y].GetComponent<Tile>();
                     if(tileScript.hasCharacter || !tileScript.passable) break;
                     else path = new Vector2Int(i, 0);
                 }
             }
             else {
                 for(int i = -1; i >= xDist; i--) {
-                    var tileScript = Tiles[sourcePos.x + i, sourcePos.y].GetComponent<TileScript>();
+                    var tileScript = Tiles[sourcePos.x + i, sourcePos.y].GetComponent<Tile>();
                     if(tileScript.hasCharacter || !tileScript.passable) break;
                     else path = new Vector2Int(i, 0);
                 }
             }
             if(yDist > 0) {
                 for(int i = 1; i <= yDist; i++) {
-                    var tileScript = Tiles[sourcePos.x, sourcePos.y + i].GetComponent<TileScript>();
+                    var tileScript = Tiles[sourcePos.x, sourcePos.y + i].GetComponent<Tile>();
                     if(tileScript.hasCharacter || !tileScript.passable) break;
                     else path = new Vector2Int(0, i);
                 }
             }
             else {
                 for(int i = -1; i >= yDist; i--) {
-                    var tileScript = Tiles[sourcePos.x, sourcePos.y + i].GetComponent<TileScript>();
+                    var tileScript = Tiles[sourcePos.x, sourcePos.y + i].GetComponent<Tile>();
                     if(tileScript.hasCharacter || !tileScript.passable) break;
                     else path = new Vector2Int(0, i);
                 }
@@ -393,7 +393,7 @@ public class Grid : MonoBehaviour
             if(path.x != 0 || path.y != 0) {
                 charToMove = sourceTileScript.characterOn;
                 var pos = new Vector2Int(sourcePos.x + path.x, sourcePos.y + path.y);
-                var tileScript = GetTileAtPos(pos).GetComponent<TileScript>();
+                var tileScript = GetTileAtPos(pos).GetComponent<Tile>();
 
                 charToMove.GetComponent<FollowPath>().abilityDist = path;
 
@@ -438,11 +438,11 @@ public class Grid : MonoBehaviour
         {
             // Get tile on source position
             GameObject sourceTile = Tiles[sourcePos.x, sourcePos.y];
-            var sourceTileScipt = sourceTile.GetComponent<TileScript>();
+            var sourceTileScipt = sourceTile.GetComponent<Tile>();
 
             // Get tile on dest position
             GameObject destTile = Tiles[destPos.x, destPos.y];
-            var destTileScript = destTile.GetComponent<TileScript>();
+            var destTileScript = destTile.GetComponent<Tile>();
 
             // Make a new path tree (Warning: we must reach the destination tile for this to work.
             // Right now this is achieved by making the range huge, but it's not efficient)
@@ -469,7 +469,7 @@ public class Grid : MonoBehaviour
                         destTile = pathTowardsDest[0].MyTile;
 
                         // Get the data from the new destination tile
-                        destTileScript = destTile.GetComponent<TileScript>();
+                        destTileScript = destTile.GetComponent<Tile>();
                     }
                     
                     // Move character to the new destination, instead
@@ -516,7 +516,7 @@ public class Grid : MonoBehaviour
     public void SetTileToImpassible(GameObject tile)
     {
         // Get script from tile
-        var tileScript = tile.GetComponent<TileScript>();
+        var tileScript = tile.GetComponent<Tile>();
 
         // Set tile to impassible
         tileScript.passable = false;
@@ -548,8 +548,8 @@ public class Grid : MonoBehaviour
         if (sourceTile != null && destTile != null)
         {
             // Get tile scripts
-            var sourceScript = sourceTile.GetComponent<TileScript>();
-            var destScript = destTile.GetComponent<TileScript>();
+            var sourceScript = sourceTile.GetComponent<Tile>();
+            var destScript = destTile.GetComponent<Tile>();
 
             // Spawn boxes for visual element
             GameObject sourceBox = Instantiate(linkBox);
@@ -618,7 +618,7 @@ public class Grid : MonoBehaviour
         // Reset highlights beforehand
         ResetAllHighlights();
 
-        var startTile = tileObject.GetComponent<TileScript>();
+        var startTile = tileObject.GetComponent<Tile>();
         // Create root node
         PathTreeNode root = new PathTreeNode();
         root.MyTile = tileObject;
@@ -653,7 +653,7 @@ public class Grid : MonoBehaviour
             tempNode = queue.Dequeue();
 
             // Get data from tile
-            var tileScript = tempNode.MyTile.GetComponent<TileScript>();
+            var tileScript = tempNode.MyTile.GetComponent<Tile>();
 
             // Highlight tile
             tileScript.highlighted = true;
@@ -698,7 +698,7 @@ public class Grid : MonoBehaviour
     }
 
     // Get neighboring tile with consideration for boarding grids
-    private GameObject GetNeighboringTile(TileScript startTile, bool isPlayer, bool passThrough, int range, Direction direction, List<Grid> boardingGrids, ref int distance)
+    private GameObject GetNeighboringTile(Tile startTile, bool isPlayer, bool passThrough, int range, Direction direction, List<Grid> boardingGrids, ref int distance)
     {
         GameObject destTile = GetTileInDirection(startTile.position, direction);
         if (destTile != null) return destTile; // Inside bounds of current grid
@@ -742,7 +742,7 @@ public class Grid : MonoBehaviour
         if (tileToCheck != null)
         {
             // Get data from tile
-            var tileScript = tileToCheck.GetComponent<TileScript>();
+            var tileScript = tileToCheck.GetComponent<Tile>();
 
             // Check if already highlighted
             if (tileScript.highlighted == false && tileScript.passable)
@@ -775,7 +775,7 @@ public class Grid : MonoBehaviour
             {
                 // Get data from tile at current pos
                 currentTile = GetTileAtPos(new Vector2Int(x,y));
-                var currentTileScript = currentTile.GetComponent<TileScript>();
+                var currentTileScript = currentTile.GetComponent<Tile>();
 
                 // Check if the tile is highlighted
                 if (currentTileScript.highlighted)
@@ -843,7 +843,7 @@ public class Grid : MonoBehaviour
         if (tileAtPos != null)
         {
             // Get character from tile
-            var tileScript = tileAtPos.GetComponent<TileScript>();
+            var tileScript = tileAtPos.GetComponent<Tile>();
             charaterAtPos = tileScript.characterOn;
         }
 
@@ -854,26 +854,26 @@ public class Grid : MonoBehaviour
     public List<GameObject> GetInteractableTileObjects(Vector2Int pos)
     {
         List<GameObject> tileObjects = new List<GameObject>();
-        TileScript tile = GetTileAtPos(pos).GetComponent<TileScript>();
+        Tile tile = GetTileAtPos(pos).GetComponent<Tile>();
         if(tile.hasObject && !tile.hasGridLink && tile.objectOn != null) tileObjects.Add(tile.objectOn);
         if(GetTileNorth(pos) != null)
         {
-            tile = GetTileNorth(pos).GetComponent<TileScript>();
+            tile = GetTileNorth(pos).GetComponent<Tile>();
             if(tile != null && tile.hasObject && !tile.hasGridLink && tile.objectOn != null && !tile.objectOn.GetComponent<GridObject>().overlapCharacter) tileObjects.Add(tile.objectOn);
         }
         if(GetTileSouth(pos) != null)
         {
-            tile = GetTileSouth(pos).GetComponent<TileScript>();
+            tile = GetTileSouth(pos).GetComponent<Tile>();
             if(tile != null && tile.hasObject && !tile.hasGridLink && tile.objectOn != null && !tile.objectOn.GetComponent<GridObject>().overlapCharacter) tileObjects.Add(tile.objectOn);
         }
         if(GetTileWest(pos) != null)
         {
-            tile = GetTileWest(pos).GetComponent<TileScript>();
+            tile = GetTileWest(pos).GetComponent<Tile>();
             if(tile != null && tile.hasObject && !tile.hasGridLink && tile.objectOn != null && !tile.objectOn.GetComponent<GridObject>().overlapCharacter) tileObjects.Add(tile.objectOn);
         }
         if(GetTileEast(pos) != null)
         {
-            tile = GetTileEast(pos).GetComponent<TileScript>();
+            tile = GetTileEast(pos).GetComponent<Tile>();
             if(tile != null && tile.hasObject && !tile.hasGridLink && tile.objectOn != null && !tile.objectOn.GetComponent<GridObject>().overlapCharacter) tileObjects.Add(tile.objectOn);
         }
         return tileObjects;
@@ -881,7 +881,7 @@ public class Grid : MonoBehaviour
 
     public void MoveUnitToGrid(GameObject unitTile)
     {
-        TileScript unitTileScript = unitTile.GetComponent<TileScript>();
+        Tile unitTileScript = unitTile.GetComponent<Tile>();
         // ----- Move the active character to the other grid -----
         Debug.Log("Moving character to another grid");
 

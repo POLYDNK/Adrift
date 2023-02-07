@@ -122,19 +122,19 @@ public class CannonUI : MonoBehaviour
         
             if (CheckIfCannon(gridScript.GetTileNorth(activePos)))
             {
-                currCannon = gridScript.GetTileNorth(activePos).GetComponent<TileScript>().objectOn;
+                currCannon = gridScript.GetTileNorth(activePos).GetComponent<Tile>().objectOn;
             }
             else if (CheckIfCannon(gridScript.GetTileEast(activePos)))
             {
-                currCannon = gridScript.GetTileEast(activePos).GetComponent<TileScript>().objectOn;
+                currCannon = gridScript.GetTileEast(activePos).GetComponent<Tile>().objectOn;
             }
             else if (CheckIfCannon(gridScript.GetTileSouth(activePos)))
             {
-                currCannon = gridScript.GetTileSouth(activePos).GetComponent<TileScript>().objectOn;
+                currCannon = gridScript.GetTileSouth(activePos).GetComponent<Tile>().objectOn;
             }
             else if (CheckIfCannon(gridScript.GetTileWest(activePos)))
             {
-                currCannon = gridScript.GetTileWest(activePos).GetComponent<TileScript>().objectOn;
+                currCannon = gridScript.GetTileWest(activePos).GetComponent<Tile>().objectOn;
             }
             else
             {
@@ -149,7 +149,7 @@ public class CannonUI : MonoBehaviour
 
         if (tile != null)
         {
-            var tileScript = tile.GetComponent<TileScript>();
+            var tileScript = tile.GetComponent<Tile>();
             if (tileScript.objectOn != null && tileScript.objectOn.tag == "Cannon")
             {
                 isCannon = true;

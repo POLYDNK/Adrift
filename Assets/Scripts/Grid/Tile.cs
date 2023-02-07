@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileScript : MonoBehaviour
+public class Tile : MonoBehaviour
 {
     // Position
     [SerializeField] public Vector2Int position;
@@ -17,7 +17,7 @@ public class TileScript : MonoBehaviour
     public GameObject characterOn = null;
     public GameObject objectOn = null;
     public Grid targetGrid = null;
-    public TileScript targetTile = null;
+    public Tile targetTile = null;
 
     // Flags
     public bool hasCharacter = false;

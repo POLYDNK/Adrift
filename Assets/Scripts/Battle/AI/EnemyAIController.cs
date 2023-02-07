@@ -72,7 +72,7 @@ public class EnemyAIController
         HeatmapGenerator.GenerateHeatmap(battleScript.aliveUnits, battleScript.activeUnit);
 
         // Get the best tile from the heatmap generator
-        TileScript targetTile = HeatmapGenerator.GetBestTile();
+        Tile targetTile = HeatmapGenerator.GetBestTile();
 
         // Perform move
         Vector2Int newPosition = targetTile.position;
