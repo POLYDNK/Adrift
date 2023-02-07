@@ -29,7 +29,7 @@ public class ShipController : MonoBehaviour
     void Update()
     {
         // Move in direction set by move direction
-        transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        if(moveSpeed > 0F) transform.position += moveDirection * moveSpeed * Time.deltaTime;
 
         // Tilting
         Vector3 newTilt = tiltOrigin + (tiltDirection * Mathf.Sin(tiltCounter) * tiltAmount / 12);

@@ -276,6 +276,58 @@ public class Character : MonoBehaviour
         return myGrid.GetComponent<Grid>().GetTileAtPos(gridPosition);
     }
 
+    // --------------------------------------------------------------
+    // @desc: Move this character along an automatically generated path to its destination
+    // @arg: destTile   - grid tile to move the character to
+    // @ret: bool      - whether the move is successful or not
+    // --------------------------------------------------------------
+    public bool PathToTile(TileScript destTile, bool onlyHighlighted)
+    {
+        bool moveSuccess = false;
+        
+        // Get tile on source position
+        GameObject sourceTile = GetTileObject();
+        var sourceTileScript = sourceTile.GetComponent<TileScript>();
+
+        // Get tile on dest position
+        var destTileScript = destTile.GetComponent<TileScript>();
+        var destPos = destTileScript.position;
+
+        // Get character on source tile
+        if (sourceTileScript.hasCharacter && !destTileScript.hasCharacter && destTileScript.passable)
+        {
+            // Only move to highlighted tiles
+            if (!onlyHighlighted || destTileScript.highlighted)
+            {
+                Debug.Log("Moving character to tile " + destPos.x + " " + destPos.y);
+
+                // Move character to destPos
+                destTileScript.PathRef.PathToRootOnStack(GetComponent<FollowPath>().PathToFollow);
+
+                // Move camera to destPos
+                Camera.main.GetComponent<CameraController>().SetCameraFollow(this.gameObject);
+
+                // Set source tile data
+                sourceTileScript.hasCharacter = false;
+                sourceTileScript.characterOn = null;
+
+                // Set destination tile data
+                destTileScript.hasCharacter = true;
+                destTileScript.characterOn = this.gameObject;
+
+                gridPosition = destPos;
+
+                moveSuccess = true;
+            }
+        }
+        else
+        {
+            Debug.Log("PathCharacterOnTile: Error! source tile does not have a character");
+        }
+
+        return moveSuccess;
+    }
+
     // Rotate the character around the y-axis to face the target position over time, return true if already facing
     public bool RotateTowards(Vector3 targetPos) {
         // This logic is extremely cursed but it works

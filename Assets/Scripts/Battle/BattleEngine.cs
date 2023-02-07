@@ -34,7 +34,6 @@ public class BattleEngine : MonoBehaviour
     public GameObject playerCrew, enemyCrew, playerShip, enemyShip; //Crews & ships
     public List<GameObject> units = new(); //All units
     public PathTreeNode activePathRoot;
-    public List<PathTreeNode> boardingPathRoots = new();
     public bool active = false; //Activation flag to be set by other systems
     public bool interactable = true; //Flag used for locking actions during events
     public bool surrendered = false, victory = false, defeat = false; //End of battle flags
@@ -238,7 +237,7 @@ public class BattleEngine : MonoBehaviour
                                 {
                                     Debug.Log("Moving " + activeUnit);
                                     Debug.Log(activeGrid.GetCharacterAtPos(selectedCharPos));
-                                    MoveUnit(tilePos, false);
+                                    MoveUnit(tileScript, false);
                                 }
                             }
                             // Action
@@ -466,30 +465,14 @@ public class BattleEngine : MonoBehaviour
     // Highlights available move tiles from a provided position and range
     public void HighlightValidMoves(Vector2Int pos, int range)
     {
-        // Only highlight if the character as pos is the active unit
+        // Only highlight if the character at pos is the active unit
         if(activeGrid.GetCharacterAtPos(pos) == activeUnit)
         {
             // Highlight move tiles
             ResetAllHighlights();
             
-            activePathRoot = activeGrid.GetAllPathsFromTile(activeGrid.GetTileAtPos(pos), range);
+            activePathRoot = activeGrid.GetAllPathsFromTile(activeGrid.GetTileAtPos(pos), GetBoardingGrids(), range);
             HighlightPathTree(activePathRoot);
-            
-            // Locate boarding tiles (these are always at the edge of a grid)
-            boardingPathRoots.Clear();
-            foreach(Grid grid in GetBoardingGrids())
-            {
-                for (int x = 0; x < grid.width; x++)
-                {
-                    for (int y = 0; y < grid.height; y++)
-                    {
-                        if ((x > 0 && x < grid.width - 1) && (y > 0 && y < grid.height - 1)) continue; // Not at edge
-                        GameObject tile = grid.GetTileAtPos(new Vector2Int(x, y));
-                        boardingPathRoots.Add(grid.GetAllPathsFromTile(tile, 0));
-                    }
-                }
-            }
-            foreach(PathTreeNode root in boardingPathRoots) HighlightPathTree(root);
         }
     }
 
@@ -752,13 +735,6 @@ public class BattleEngine : MonoBehaviour
         Character  activeCharScript = activeUnit.GetComponent<Character>();
         TileScript tileScript = activeGrid.GetTileAtPos(tilePos).GetComponent<TileScript>();
         GameObject selectedCharacter = null;
-        
-
-        Debug.Log("Moving: " + moving.ToString()
-        + " || Acted: " + acted.ToString()
-        + " || Selected Ability: " + selectedAbility.displayName 
-        + " || activeUnit AP: " + activeUnit.GetComponent<Character>().ap
-        + " || Selected Ability Cost: " + selectedAbility.costAP);
 
         // ------- Perform Checks -------
         /*
@@ -786,6 +762,12 @@ public class BattleEngine : MonoBehaviour
             Debug.Log("ActUnit: Error! Active character doesn't have enough AP for this ability");
             return false;
         }
+        
+        Debug.Log("Moving: " + moving.ToString()
+                             + " || Acted: " + acted.ToString()
+                             + " || Selected Ability: " + selectedAbility.displayName 
+                             + " || activeUnit AP: " + activeUnit.GetComponent<Character>().ap
+                             + " || Selected Ability Cost: " + selectedAbility.costAP);
 
         // Calculate manhattan distance.
         int xDist = activeCharScript.gridPosition.x - tilePos.x;
@@ -955,38 +937,37 @@ public class BattleEngine : MonoBehaviour
         return false;
     }
 
-    IEnumerator EndComboAttack(GameObject user, GameObject target) {
+    IEnumerator EndComboAttack(GameObject user, GameObject target)
+    {
         yield return new WaitWhile(() => !user.GetComponent<Character>().RotateTowards(target.GetComponent<Character>().GetTileObject().transform.position)); //Wait for rotation first
         GetComboAttack(user).AffectCharacter(user, target, 0);
         yield break;
     }
 
     //Try to move the unit to the specified position on the grid. Returns true if move succeeds. Will not affect game state if simulate is true.
-    public bool MoveUnit(Vector2Int tilePos, bool simulate = false) 
+    public bool MoveUnit(TileScript tile, bool simulate = false)
     {
+        Vector2Int tilePos = tile.position;
         if(!moved && moving && charSelected && activeUnit == activeGrid.GetCharacterAtPos(selectedCharPos) && tilePos != selectedCharPos) 
         {
             // Move character
-            if (activeGrid.PathCharacterOnTile(selectedCharPos, tilePos, true) == false)
+            if (!activeUnit.GetComponent<Character>().PathToTile(tile, true))
             {
                 Debug.Log("Cannot move character to tile " + tilePos.x + " " + tilePos.y);
                 return false;
             }
-            else 
-            {
-                if(simulate) return true;
-                StartCoroutine(EndMoveUnit(tilePos));
-                return true;
-            }
+            if(simulate) return true;
+            StartCoroutine(EndMoveUnit(tile));
+            return true;
         }
         return false;
     }
 
-    IEnumerator EndMoveUnit(Vector2Int tilePos) {
+    IEnumerator EndMoveUnit(TileScript tile) {
         // Unselect currently select character
         Debug.Log("Unselecting character on " + selectedCharPos.x + " " + selectedCharPos.y);
-        activeUnitPos = tilePos;
-        activeUnitTile = activeGrid.GetTileAtPos(tilePos);
+        activeUnitPos = tile.position;
+        activeUnitTile = tile.gameObject;
         activeGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
         charSelected = false;
         charCard.Close();

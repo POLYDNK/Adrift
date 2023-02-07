@@ -24,4 +24,9 @@ public static class DataUtil
         }
         return null;
     }
+
+    public static float DistanceSqr(Vector3 start, Vector3 end)
+    {
+        return Mathf.Pow(end.x - start.x, 2) + Mathf.Pow(end.y - start.y, 2) + Mathf.Pow(end.z - start.z, 2);
+    }
 }

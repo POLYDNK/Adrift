@@ -3,10 +3,27 @@
 /// @description: this script spawns a grid of tile objects, then
 /// it provides an interface to interact with said spawned grid
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
+
+public class Direction
+{
+    public static readonly Direction NORTH = new(0, 1);
+    public static readonly Direction SOUTH = new(0, -1);
+    public static readonly Direction EAST = new(1, 0);
+    public static readonly Direction WEST = new(-1, 0);
+    public readonly int xMove, yMove;
+
+    private Direction(int xMove, int yMove)
+    {
+        this.xMove = xMove;
+        this.yMove = yMove;
+    }
+}
 
 public class Grid : MonoBehaviour
 {
@@ -408,69 +425,6 @@ public class Grid : MonoBehaviour
     // @desc: Move a character along an automatically generated path
     // @arg: sourcePos - logical grid position with a character on it
     // @arg: destPos   - logical grid position to move the character to
-    // @ret: bool      - whether the move is successful or not
-    // --------------------------------------------------------------
-    public bool PathCharacterOnTile(Vector2Int sourcePos, Vector2Int destPos, bool onlyHighlighted)
-    {
-        GameObject charToMove = null;
-        bool moveSuccess = false;
-
-        // Check whether tiles are in range
-        if (TilePosInRange(sourcePos) && TilePosInRange(destPos))
-        {
-            // Get tile on source position
-            GameObject sourceTile = Tiles[sourcePos.x, sourcePos.y];
-            var sourceTileScipt = sourceTile.GetComponent<TileScript>();
-
-            // Get tile on dest position
-            GameObject destTile = Tiles[destPos.x, destPos.y];
-            var destTileScript = destTile.GetComponent<TileScript>();
-
-            // Get character on source tile
-            if (sourceTileScipt.hasCharacter && !destTileScript.hasCharacter && destTileScript.passable)
-            {
-                // Only move to highlighted tiles
-                if (!onlyHighlighted || destTileScript.highlighted)
-                {
-                    Debug.Log("Moving character to tile " + destPos.x + " " + destPos.y);
-                    charToMove = sourceTileScipt.characterOn;
-
-                    // Move character to destPos
-                    destTileScript.PathRef.PathToRootOnStack(charToMove.GetComponent<FollowPath>().PathToFollow);
-
-                    // Move camera to destPos
-                    cam.GetComponent<CameraController>().SetCameraFollow(charToMove);
-
-                    // Set source tile data
-                    sourceTileScipt.hasCharacter = false;
-                    sourceTileScipt.characterOn = null;
-
-                    // Set destination tile data
-                    destTileScript.hasCharacter = true;
-                    destTileScript.characterOn = charToMove;
-
-                    charToMove.GetComponent<Character>().gridPosition = destPos;
-
-                    moveSuccess = true;
-                }
-            }
-            else
-            {
-                Debug.Log("PathCharacterOnTile: Error! source tile does not have a character");
-            }
-        }
-        else
-        {
-            Debug.Log("PathCharacterOnTile: Error! tile source or dest position is out of range");
-        }
-        
-        return moveSuccess;
-    }
-
-    // --------------------------------------------------------------
-    // @desc: Move a character along an automatically generated path
-    // @arg: sourcePos - logical grid position with a character on it
-    // @arg: destPos   - logical grid position to move the character to
     // @arg: maxRange  - the maximum range the character can move
     // @ret: bool      - whether the move is successful or not
     // --------------------------------------------------------------
@@ -646,6 +600,11 @@ public class Grid : MonoBehaviour
         return inRange;
     }
 
+    public PathTreeNode GetAllPathsFromTile(GameObject tile, int range, bool passThrough = false)
+    {
+        return GetAllPathsFromTile(tile, new List<Grid>(), range, passThrough);
+    }
+
     // --------------------------------------------------------------
     // @desc: Creates a tree data structure based on what moves a 
     // character can take from a given tile position
@@ -654,15 +613,15 @@ public class Grid : MonoBehaviour
     // @arg: passThrough  - makes every tile valid
     // @ret: PathTreeNode - the constructed tree
     // --------------------------------------------------------------
-    public PathTreeNode GetAllPathsFromTile(GameObject tile, int range, bool passThrough = false)
+    public PathTreeNode GetAllPathsFromTile(GameObject tileObject, List<Grid> boardingGrids, int range, bool passThrough = false)
     {
         // Reset highlights beforehand
         ResetAllHighlights();
 
-        var startTile = tile.GetComponent<TileScript>();
+        var startTile = tileObject.GetComponent<TileScript>();
         // Create root node
         PathTreeNode root = new PathTreeNode();
-        root.MyTile = tile;
+        root.MyTile = tileObject;
         root.TileRange = range;
 
         // Character should always be here, but just in case
@@ -694,49 +653,78 @@ public class Grid : MonoBehaviour
             tempNode = queue.Dequeue();
 
             // Get data from tile
-            var tileRend = tempNode.MyTile.GetComponent<Renderer>();
             var tileScript = tempNode.MyTile.GetComponent<TileScript>();
-            Vector2Int tilePos = tileScript.position;
 
             // Highlight tile
             tileScript.highlighted = true;
+            int nDist = 1, sDist = 1, wDist = 1, eDist = 1;
 
             // Get neighboring tiles
-            GameObject upTile = GetTileAtPos(new Vector2Int(tilePos.x, tilePos.y - 1));
-            GameObject downTile = GetTileAtPos(new Vector2Int(tilePos.x, tilePos.y + 1));
-            GameObject leftTile = GetTileAtPos(new Vector2Int(tilePos.x - 1, tilePos.y));
-            GameObject rightTile = GetTileAtPos(new Vector2Int(tilePos.x + 1, tilePos.y));
+            GameObject upTile = tileScript.grid.GetNeighboringTile(tileScript, isPlayer, passThrough, tempNode.TileRange, Direction.NORTH, boardingGrids, ref nDist);
+            GameObject downTile = tileScript.grid.GetNeighboringTile(tileScript, isPlayer, passThrough, tempNode.TileRange, Direction.SOUTH, boardingGrids, ref sDist);
+            GameObject leftTile = tileScript.grid.GetNeighboringTile(tileScript, isPlayer, passThrough, tempNode.TileRange, Direction.WEST, boardingGrids, ref wDist);
+            GameObject rightTile = tileScript.grid.GetNeighboringTile(tileScript, isPlayer, passThrough, tempNode.TileRange, Direction.EAST, boardingGrids, ref eDist);
         
             // Add neighboring tiles to queue if in range
             if (tempNode.TileRange > 0)
             {
                 if (ValidHighlightTile(upTile, isPlayer, passThrough))
                 {
-                    tempNode.Up = new PathTreeNode(tempNode, upTile, tempNode.TileRange-1);
+                    tempNode.Up = new PathTreeNode(tempNode, upTile, tempNode.TileRange-nDist);
                     queue.Enqueue(tempNode.Up);
                 }
 
                 if (ValidHighlightTile(downTile, isPlayer, passThrough))
                 {
-                    tempNode.Down = new PathTreeNode(tempNode, downTile, tempNode.TileRange-1);
+                    tempNode.Down = new PathTreeNode(tempNode, downTile, tempNode.TileRange-sDist);
                     queue.Enqueue(tempNode.Down);
                 }
 
                 if (ValidHighlightTile(leftTile, isPlayer, passThrough))
                 {
-                    tempNode.Left = new PathTreeNode(tempNode, leftTile, tempNode.TileRange-1);
+                    tempNode.Left = new PathTreeNode(tempNode, leftTile, tempNode.TileRange-wDist);
                     queue.Enqueue(tempNode.Left);
                 }
 
                 if (ValidHighlightTile(rightTile, isPlayer, passThrough))
                 {
-                    tempNode.Right = new PathTreeNode(tempNode, rightTile, tempNode.TileRange-1);
+                    tempNode.Right = new PathTreeNode(tempNode, rightTile, tempNode.TileRange-eDist);
                     queue.Enqueue(tempNode.Right);
                 }
             }
         }
 
         return root;
+    }
+
+    // Get neighboring tile with consideration for boarding grids
+    private GameObject GetNeighboringTile(TileScript startTile, bool isPlayer, bool passThrough, int range, Direction direction, List<Grid> boardingGrids, ref int distance)
+    {
+        GameObject destTile = GetTileInDirection(startTile.position, direction);
+        if (destTile != null) return destTile; // Inside bounds of current grid
+        float minDist = float.MaxValue;
+        // At an edge, search for valid boarding tiles
+        foreach(Grid grid in boardingGrids)
+        {
+            if (startTile.grid.Equals(grid)) continue; // Must be a different grid
+            for (int x = 0; x < grid.width; x++)
+            {
+                for (int y = 0; y < grid.height; y++)
+                {
+                    if ((x > 0 && x < grid.width - 1) && (y > 0 && y < grid.height - 1)) continue; // Not at edge
+                    GameObject tile = grid.GetTileAtPos(new Vector2Int(x, y));
+                    if (!ValidHighlightTile(tile, isPlayer, passThrough)) continue; // Unit must be able to move
+                    float dist = DataUtil.DistanceSqr(startTile.transform.position, tile.transform.position);
+                    if (dist < minDist && dist <= range * range) // Use the closest valid tile
+                    {
+                        minDist = dist;
+                        destTile = tile;
+                    }
+                }
+            }
+        }
+        if(destTile != null) distance = Mathf.FloorToInt(Mathf.Sqrt(minDist));
+        return destTile;
     }
 
     // --------------------------------------------------------------
@@ -746,7 +734,7 @@ public class Grid : MonoBehaviour
     // @arg: passThrough - makes every tile valid (but still can't be null)
     // @ret: bool        - whether the tile can be highlighted
     // --------------------------------------------------------------
-    private bool ValidHighlightTile(GameObject tileToCheck, bool isPlayer, bool passThrough = false)
+    public static bool ValidHighlightTile(GameObject tileToCheck, bool isPlayer, bool passThrough = false)
     {
         bool valid = false;
 
@@ -823,6 +811,11 @@ public class Grid : MonoBehaviour
         }
 
         return tileAtPos;
+    }
+
+    public GameObject GetTileInDirection(Vector2Int pos, Direction direction)
+    {
+        return GetTileAtPos(new Vector2Int(pos.x + direction.xMove, pos.y + direction.yMove));
     }
 
     public GameObject GetTileNorth(Vector2Int pos) {
