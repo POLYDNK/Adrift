@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -570,7 +571,7 @@ public class BattleEngine : MonoBehaviour
     }
 
     //Start a new turn for the active unit
-    public void StartTurn()
+    public async void StartTurn()
     {
         // Increment turn count and populate turn queue if empty
         turnCount++;
@@ -615,7 +616,7 @@ public class BattleEngine : MonoBehaviour
             SelectCoin(moveCoin, moveCoinAnimator, false);
             SelectCoin(endCoin, endCoinAnimator, false);
             SelectCoin(surrenderCoin, surrenderCoinAnimator, false);
-            DoAITurn();
+            await DoAITurn();
         }
         else
         {
@@ -1329,12 +1330,12 @@ public class BattleEngine : MonoBehaviour
         selectedAbility = abilityToSelect;
     }
 
-    public void DoAITurn() 
+    public async Task DoAITurn() 
     {
         Debug.Log("doAITurn: AI Turn began");
 
         //StartCoroutine(aiTurnWaiter());
-        StartCoroutine(AIController.PerformTurn(activeUnit.GetComponent<Character>(), 2.0f, 2.0f));
+        await AIController.PerformTurn(activeUnit.GetComponent<Character>(), 2000, 2000);
     }
 
     IEnumerator AITurnWaiter()

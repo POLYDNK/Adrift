@@ -4,15 +4,17 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class EnemyAIController
 {
     // Component References
-    [SerializeField] public Character myCharacter;
-    [SerializeField] public BattleEngine battleScript = null;
+    public Character myCharacter;
+    public BattleEngine battleScript = null;
 
     // Private Vars
+    private int highScore;
     private Grid currentGrid;
     private GameObject currentTile;
     private List<ValidTarget> validTargets = null;
@@ -31,37 +33,40 @@ public class EnemyAIController
     // --------------------------------------------------------------
     // @desc: Default constructor
     // @arg: character - The currently active character to take a turn
-    // @arg: moveTime  - Wait time after moving
-    // @arg: endTime   - Wait time after acting
-    // @ret: IEnumerator - Used to enable waiting/yielding functionality
+    // @arg: moveTime  - Wait time after moving (in milliseconds)
+    // @arg: endTime   - Wait time after acting (in milliseconds)
+    // @ret: Task - This method should be non-blocking
     // --------------------------------------------------------------
-    public IEnumerator PerformTurn(Character character, float moveTime, float endTime)
+    public async Task PerformTurn(Character character, int moveTime, int endTime)
     {
         // Setup
         myCharacter = character;
         currentGrid = myCharacter.myGrid.GetComponent<Grid>();
+        highScore   = int.MinValue;
 
         Debug.Log("performTurn: moving to best tile");
+
+        // Pan time
+        await Task.Delay(200);
         
+        // Move
         Move();
 
         // Move time
-        yield return new WaitForSecondsRealtime(moveTime);
+        await Task.Delay(moveTime);
 
+        // Act
         PerformAction();
 
-        //battleScript.EndTurn();
-        //battleScript.LogicUpdate();
-
         // End time
-        yield return new WaitForSecondsRealtime(endTime);
+        await Task.Delay(endTime);
     }
 
     // --------------------------------------------------------------
     // @desc: Moves a character towards the tile with the highest generated
     // heat value provided by the HeatmapGenerator class
     // --------------------------------------------------------------
-    private void Move()
+    private async Task Move()
     {
         // Generate Heatmap
         HeatmapGenerator.GenerateHeatmap(battleScript.aliveUnits, battleScript.activeUnit);
@@ -77,11 +82,7 @@ public class EnemyAIController
         {
             currentGrid.MoveTowardsTile(myCharacter.gridPosition, newPosition, 
                                         false, myCharacter.mv.baseValue);
-
             battleScript.Moved();
-            //battleScript.EndMoveUnit(myCharacter.gridPosition);
-            
-            //battleScript.MoveUnit(newPosition);
         }
 
         currentTile = currentGrid.GetTileAtPos(myCharacter.gridPosition);
@@ -92,11 +93,13 @@ public class EnemyAIController
     // --------------------------------------------------------------
     // @desc: Attempts to perform an action
     // --------------------------------------------------------------
-    private void PerformAction()
+    private async Task PerformAction()
     {
         ValidTarget abilityToUse = SelectAbilityAndTarget();
 
-        if (abilityToUse != null)
+        bool interact = TryInteractions();
+
+        if (interact == false && abilityToUse != null)
         {
             // Set ability to use
             battleScript.SelectAbility(abilityToUse.GetAbility());
@@ -117,6 +120,39 @@ public class EnemyAIController
         }
     }
 
+    private bool TryInteractions()
+    {
+        bool interacted = false;
+
+        // Get surrounding interactable grid objects
+        List<GameObject> gridObjects = currentGrid.GetInteractableTileObjects(myCharacter.gridPosition);
+
+        // For every surrounding grid object -
+        foreach (GameObject gridObj in gridObjects)
+        {
+            Debug.Log("TryInteraction: found a grid object");
+
+            // Get script
+            GridObject objScript = gridObj.GetComponent<GridObject>();
+
+            // Do this for cannon objects
+            if (objScript is CannonObject)
+            {
+
+                // Get cannon script
+                CannonObject cannonScript = gridObj.GetComponent<CannonObject>();
+
+                // Attempt to interact
+                Debug.Log("TryInteraction: attempting to interact w/ cannon");
+                cannonScript.InteractSecondary(battleScript.activeUnit);
+                interacted = true;
+                break;
+            }
+        }
+
+        return interacted;
+    }
+
     // --------------------------------------------------------------
     // @desc: Goes through each valid target for each abilty - and then
     // selects the character/ability pair with the highest score
@@ -126,7 +162,6 @@ public class EnemyAIController
     private ValidTarget SelectAbilityAndTarget()
     {
         ValidTarget targetToReturn = null;
-        int highScore = int.MinValue;
 
         // Time logging
         timer = Time.time;
@@ -269,7 +304,7 @@ public class EnemyAIController
             power = HeatmapGenerator.abilityImpact(_ability, caster, target);
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return caster.displayName + " can be targeted by the ability " + ability.displayName;
         }

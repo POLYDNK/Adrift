@@ -50,6 +50,9 @@ public static class HeatmapGenerator
         currentGrid = activeChar.myGrid.GetComponent<Grid>();
         MovementHeat(20);
 
+        // Generate cannon heat
+        CannonHeat(100);
+
         Debug.Log("GenerateHeatmap: Heatmap generated (time elapsed: " + (Time.time-timer).ToString() + "s)");
     }
 
@@ -114,7 +117,6 @@ public static class HeatmapGenerator
     static void MovementHeat(int moveWeight)
     {
         // Get what tiles we need to touch
-        GameObject myTile = currentGrid.GetTileAtPos(activeTile.position);
         PathTreeNode tilesInRange = currentGrid.GetAllPathsFromTile(activeTileObj, activeChar.mv.baseValue);
         List<GameObject> tiles = tilesInRange.GetAllTiles();
 
@@ -131,6 +133,43 @@ public static class HeatmapGenerator
                 // Since the active character can move to this tile,
                 // we'll increase the heat of this tile
                 tileScript.heatVal += moveWeight;
+
+                // Check whether the high score is beaten
+                if (tileScript.heatVal > highScore)
+                {
+                    highScore = tileScript.heatVal;
+                    bestTile = tileScript;
+                }
+            }
+        }
+    }
+
+    static void CannonHeat(int cannonHeat)
+    {
+        // Get every cannon object
+        GameObject[] cannons = GameObject.FindGameObjectsWithTag("Cannon");
+
+        // Do this for every cannon object
+        foreach (GameObject cannon in cannons)
+        {
+            // Get data from cannon
+            GridObject cannonScript =  cannon.GetComponent<GridObject>();
+            Vector2Int pos = cannonScript.gridPosition;
+            Grid grid = cannonScript.gridReference.GetComponent<Grid>();
+
+            // Get adjacent tiles
+            GameObject cannonTile = grid.GetTileAtPos(pos);
+            PathTreeNode adjacentTiles = grid.GetAllPathsFromTile(cannonTile, 1);
+            List<GameObject> tiles = adjacentTiles.GetAllTiles();
+
+            // Increase heat of said tiles
+            foreach (GameObject tile in tiles)
+            {
+                // Get tile script
+                TileScript tileScript = tile.GetComponent<TileScript>();
+
+                // Increase heat
+                tileScript.heatVal += cannonHeat;
 
                 // Check whether the high score is beaten
                 if (tileScript.heatVal > highScore)
