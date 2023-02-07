@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using UnityEditor;
 using UnityEngine.Serialization;
 
+//test
 [CreateAssetMenu] //allows creating of item assets directly unity by right clicking project
 public class Ability : ScriptableObject
 {
