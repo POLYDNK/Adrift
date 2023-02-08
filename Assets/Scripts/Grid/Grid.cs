@@ -423,71 +423,65 @@ public class Grid : MonoBehaviour
 
     // --------------------------------------------------------------
     // @desc: Move a character along an automatically generated path
-    // @arg: sourcePos - logical grid position with a character on it
-    // @arg: destPos   - logical grid position to move the character to
-    // @arg: maxRange  - the maximum range the character can move
-    // @ret: bool      - whether the move is successful or not
+    // @arg: sourceTile - the source tile script with a character on it
+    // @arg: destTile   - the destination tile script to move the character to
+    // @arg: maxRange   - the maximum range the character can move
+    // @ret: bool       - whether the move is successful or not
     // --------------------------------------------------------------
-    public bool MoveTowardsTile(Vector2Int sourcePos, Vector2Int destPos, bool onlyHighlighted, int maxRange)
+    public bool MoveTowardsTile(Tile sourceTile, Tile destTile, bool onlyHighlighted, int maxRange)
     {
         GameObject charToMove = null;
         bool moveSuccess = false;
+        Vector2Int sourcePos = sourceTile.position;
+        Vector2Int destPos = destTile.position;
 
         // Check whether tiles are in range
         if (TilePosInRange(sourcePos) && TilePosInRange(destPos))
         {
-            // Get tile on source position
-            GameObject sourceTile = Tiles[sourcePos.x, sourcePos.y];
-            var sourceTileScipt = sourceTile.GetComponent<Tile>();
-
-            // Get tile on dest position
-            GameObject destTile = Tiles[destPos.x, destPos.y];
-            var destTileScript = destTile.GetComponent<Tile>();
-
             // Make a new path tree (Warning: we must reach the destination tile for this to work.
-            // Right now this is achieved by making the range huge, but it's not efficient)
-            sourceTileScipt.PathRef = GetAllPathsFromTile(sourceTile, maxRange+100);
+            // Right now this is achieved by making the max range huge, but it's not efficient)
+            sourceTile.PathRef = GetAllPathsFromTile(sourceTile.gameObject, maxRange+100);
+
 
             // Get character on source tile
-            if (sourceTileScipt.hasCharacter && !destTileScript.hasCharacter && destTileScript.passable)
+            if (sourceTile.hasCharacter && !destTile.hasCharacter && destTile.passable)
             {
                 // Only move to highlighted tiles
-                if (!onlyHighlighted || destTileScript.highlighted)
+                if (!onlyHighlighted || destTile.highlighted)
                 {
                     Debug.Log("Moving character to tile " + destPos.x + " " + destPos.y);
-                    charToMove = sourceTileScipt.characterOn;
+                    charToMove = sourceTile.characterOn;
 
                     // Get a list of tiles towards the destination
-                    List<PathTreeNode> pathTowardsDest = destTileScript.PathRef.PathToRootList();
+                    List<PathTreeNode> pathTowardsDest = destTile.PathRef.PathToRootList();
 
                     // Cut down stack to max range
-                    while (pathTowardsDest.Count-1 > maxRange || destTileScript.hasCharacter)
+                    while (pathTowardsDest.Count-1 > maxRange || destTile.hasCharacter)
                     {
                         pathTowardsDest.RemoveAt(0);
 
                         // Destination tile is the first element in the list
-                        destTile = pathTowardsDest[0].MyTile;
-
-                        // Get the data from the new destination tile
-                        destTileScript = destTile.GetComponent<Tile>();
+                        destTile = pathTowardsDest[0].MyTile.GetComponent<Tile>();
                     }
                     
                     // Move character to the new destination, instead
-                    destTileScript.PathRef.PathToRootOnStack(charToMove.GetComponent<FollowPath>().PathToFollow);
+                    destTile.PathRef.PathToRootOnStack(charToMove.GetComponent<FollowPath>().PathToFollow);
 
                     // Set camera to follow moving character
                     cam.GetComponent<CameraController>().SetCameraFollow(charToMove);
 
                     // Set source tile data
-                    sourceTileScipt.hasCharacter = false;
-                    sourceTileScipt.characterOn = null;
+                    sourceTile.hasCharacter = false;
+                    sourceTile.characterOn = null;
 
                     // Set destination tile data
-                    destTileScript.hasCharacter = true;
-                    destTileScript.characterOn = charToMove;
+                    destTile.hasCharacter = true;
+                    destTile.characterOn = charToMove;
 
-                    Debug.Log("gridPosition update");
-                    charToMove.GetComponent<Character>().gridPosition = destTileScript.position;
+                    // Update character data
+                    Character charScript = charToMove.GetComponent<Character>();
+                    charScript.gridPosition = destTile.position;
+                    charScript.myGrid = destTile.grid.gameObject;
 
                     moveSuccess = true;
                 }
@@ -602,6 +596,24 @@ public class Grid : MonoBehaviour
 
     public PathTreeNode GetAllPathsFromTile(GameObject tile, int range, bool passThrough = false)
     {
+        /*
+        // Attempt to get boarding grids from the battle engine
+        List<Grid> boardingGrids = null;
+        BattleEngine battleScript = null;
+        GameObject be = GameObject.FindWithTag("GameController");
+
+        if (be.name == "BattleEngine")
+        {
+            battleScript = be.GetComponent<BattleEngine>();
+            boardingGrids = battleScript.boardableGrids;
+        }
+        else
+        {
+            boardingGrids = new List<Grid>();
+        }
+        */
+
+        // Call the real method from here
         return GetAllPathsFromTile(tile, new List<Grid>(), range, passThrough);
     }
 

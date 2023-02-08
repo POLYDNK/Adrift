@@ -71,16 +71,16 @@ public class EnemyAIController
         // Generate Heatmap
         HeatmapGenerator.GenerateHeatmap(battleScript.aliveUnits, battleScript.activeUnit);
 
+        // Get source tile
+        Tile sourceTile = currentGrid.GetTileAtPos(myCharacter.gridPosition).GetComponent<Tile>();
+
         // Get the best tile from the heatmap generator
         Tile targetTile = HeatmapGenerator.GetBestTile();
 
-        // Perform move
-        Vector2Int newPosition = targetTile.position;
-
         // Check whether the char actually needs to move before doing do
-        if (myCharacter.gridPosition != newPosition)
+        if (sourceTile.position != targetTile.position)
         {
-            currentGrid.MoveTowardsTile(myCharacter.gridPosition, newPosition, 
+            currentGrid.MoveTowardsTile(sourceTile, targetTile, 
                                         false, myCharacter.mv.baseValue);
             battleScript.Moved();
         }
@@ -136,15 +136,27 @@ public class EnemyAIController
             GridObject objScript = gridObj.GetComponent<GridObject>();
 
             // Do this for cannon objects
-            if (objScript is CannonObject)
+            if (objScript is CannonObject && highScore < 300)
             {
-
                 // Get cannon script
                 CannonObject cannonScript = gridObj.GetComponent<CannonObject>();
 
-                // Attempt to interact
-                Debug.Log("TryInteraction: attempting to interact w/ cannon");
-                cannonScript.InteractSecondary(battleScript.activeUnit);
+                int random = Random.Range(0, 2);
+
+                if (random == 0)
+                {
+                    // Attempt to fire cannon
+                    Debug.Log("TryInteraction: attempting to fire cannon");
+                    cannonScript.InteractPrimary(battleScript.activeUnit);
+                }
+                else
+                {
+                    // Attempt to launch self
+                    Debug.Log("TryInteraction: attempting to launch self");
+                    cannonScript.InteractSecondary(battleScript.activeUnit);
+                    
+                }
+
                 interacted = true;
                 break;
             }
