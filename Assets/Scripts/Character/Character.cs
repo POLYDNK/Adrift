@@ -318,6 +318,7 @@ public class Character : MonoBehaviour
 
                 myGrid = destTile.grid.gameObject;
                 gridPosition = destPos;
+                transform.SetParent(myGrid.transform.parent.transform, true); // Parent this character to the new ship
 
                 moveSuccess = true;
             }

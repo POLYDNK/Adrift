@@ -58,7 +58,7 @@ public class BattleEngine : MonoBehaviour
     //UI references
     [SerializeField] public CharacterCard charCard;
     [FormerlySerializedAs("crewTurnOrder")] [SerializeField] public BattleTurnManager crewTurnManager;
-    public GameObject canvas, actionCoin, moveCoin, endCoin, surrenderCoin;
+    public GameObject canvas, actionCoin, moveCoin, endCoin, surrenderCoin, activeCoin;
     private GameObject lastCoin;
     private Animator actionCoinAnimator, moveCoinAnimator, endCoinAnimator, surrenderCoinAnimator;
     private List<Button> actionButtons = new();
@@ -73,16 +73,14 @@ public class BattleEngine : MonoBehaviour
     private static readonly int GridMask = 1 << 6, CoinMask = 1 << 12;
 
     //Selection Management
+    private Grid highlightedGrid, selectedGrid;
     private bool charSelected = false;
     private bool charHighlighted = false;
     private Vector2Int selectedCharPos;
     private Vector2Int highlightedCharPos;
-    private Grid selectedGrid;
     private int lastXDist, lastYDist; //Last distance between user and target for ability selection
 
-    //AI Variables (OLD)
-    private PlayerActionList playerActions = new();
-    private GameObject playerTarget; //Might be unnecessary
+    //Hashes
     private static readonly int Hovered = Animator.StringToHash("hovered");
     private static readonly int Selected = Animator.StringToHash("selected");
     private static readonly int Interactable = Animator.StringToHash("interactable");
@@ -174,8 +172,9 @@ public class BattleEngine : MonoBehaviour
                             lastCoinAnimator.SetBool(Hovered, false);
                             if(!lastCoinAnimator.GetBool(Selected)) lastCoin.transform.GetChild(0).gameObject.SetActive(false); //Disable text of old coin
                         }
-                        coin.GetComponent<Animator>().SetBool(Hovered, true);
-                        hit.transform.GetChild(0).gameObject.SetActive(true); //Enable text of new coin
+                        Animator coinAnimator = coin.GetComponent<Animator>();
+                        coinAnimator.SetBool(Hovered, true);
+                        if(coinAnimator.GetBool(Interactable)) hit.transform.GetChild(0).gameObject.SetActive(true); //Enable text of new coin
                     }
                     else coin.GetComponent<Animator>().SetBool(Hovered, false);
 
@@ -253,14 +252,9 @@ public class BattleEngine : MonoBehaviour
                         {
                             if(charSelected == false && moving) //Moving
                             {
-                                bool okayToHighlight = true;
-
                                 // Prevent highlighting the tile w/ a selected
                                 // character on it
-                                if (charSelected && selectedCharPos == tilePos)
-                                {
-                                    okayToHighlight = false;
-                                }
+                                bool okayToHighlight = !(charSelected && selectedCharPos == tilePos && selectedGrid == highlightedGrid);
 
                                 // Cannot highlight tiles without a character on it
                                 if (tileScript.hasCharacter == false)
@@ -272,14 +266,15 @@ public class BattleEngine : MonoBehaviour
                                 // then unhighlight it
                                 if (charHighlighted && highlightedCharPos != tilePos)
                                 {
-                                    activeGrid.Tiles[highlightedCharPos.x, highlightedCharPos.y].GetComponent<Renderer>().material = IsTileActive(highlightedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
+                                    highlightedGrid.Tiles[highlightedCharPos.x, highlightedCharPos.y].GetComponent<Renderer>().material = IsTileActive(highlightedGrid, highlightedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
                                 }
 
                                 // Highlight mouse over tile if it's okay to highlight it
                                 if (okayToHighlight)
                                 {
-                                    selectRend.material = IsTileActive(highlightedCharPos) ? activeGrid.activeHighlighted : activeGrid.highlighted;
+                                    selectRend.material = IsTileActive(tileScript.grid, highlightedCharPos) ? activeGrid.activeHighlighted : activeGrid.highlighted;
                                     highlightedCharPos = tilePos;
+                                    highlightedGrid = tileScript.grid;
                                     charHighlighted = true;
                                 }
                             }
@@ -287,7 +282,7 @@ public class BattleEngine : MonoBehaviour
                                 if(charHighlighted && highlightedCharPos != tilePos && selectedAbility != null) {
                                     foreach(GameObject selTile in activeGrid.GetAllTiles()) {
                                         var selPos = selTile.GetComponent<Tile>().position;
-                                        if(selPos != activeUnitPos && selTile.GetComponent<Tile>().passable) selTile.GetComponent<Renderer>().material = IsTileActive(selPos) ? activeGrid.activeUnselected : (Mathf.Abs(activeUnitPos.x - selPos.x) + Mathf.Abs(activeUnitPos.y - selPos.y) > selectedAbility.range ? activeGrid.unselected : activeGrid.abilityHighlighted);
+                                        if(selPos != activeUnitPos && selTile.GetComponent<Tile>().passable) selTile.GetComponent<Renderer>().material = IsTileActive(activeGrid, selPos) ? activeGrid.activeUnselected : (Mathf.Abs(activeUnitPos.x - selPos.x) + Mathf.Abs(activeUnitPos.y - selPos.y) > selectedAbility.range ? activeGrid.unselected : activeGrid.abilityHighlighted);
                                     }
                                 }
                                 if(selectedAbility != null && tileScript.highlighted && Mathf.Abs(activeUnitPos.x - tilePos.x) + Mathf.Abs(activeUnitPos.y - tilePos.y) <= selectedAbility.range) {
@@ -299,6 +294,7 @@ public class BattleEngine : MonoBehaviour
                                             if(selTileScript.passable && selTileScript.characterOn != activeUnit) {
                                                 if(pos.x == 0 && pos.y == 0) {
                                                     highlightedCharPos = selPos;
+                                                    highlightedGrid = tileScript.grid;
                                                     charHighlighted = true;
                                                 }
                                                 selTileScript.highlighted = true;
@@ -316,7 +312,7 @@ public class BattleEngine : MonoBehaviour
                 if(!mouseOnGrid) {
                     if (charHighlighted)
                     {
-                        if(moving) activeGrid.Tiles[highlightedCharPos.x, highlightedCharPos.y].GetComponent<Renderer>().material = IsTileActive(highlightedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
+                        if(moving) highlightedGrid.Tiles[highlightedCharPos.x, highlightedCharPos.y].GetComponent<Renderer>().material = IsTileActive(highlightedGrid, highlightedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
                         /*else if(selectedAbility != null) {
                             foreach(Vector2Int pos in selectedAbility.getRelativeShape(lastXDist, lastYDist)) {
                                 var selPos = new Vector2Int(highlightedCharPos.x + pos.x, highlightedCharPos.y + pos.y);
@@ -377,7 +373,7 @@ public class BattleEngine : MonoBehaviour
                     if (currentTileScript.highlighted)
                     {
                         // Reset highlighting
-                        currentTile.GetComponent<Renderer>().material = IsTileActive(new Vector2Int(x, y))
+                        currentTile.GetComponent<Renderer>().material = IsTileActive(grid, new Vector2Int(x, y))
                             ? grid.activeUnselected
                             : grid.unselected;
                         currentTileScript.highlighted = false;
@@ -406,7 +402,7 @@ public class BattleEngine : MonoBehaviour
             else if (tilePos == selectedCharPos)
             {
                 ResetAllHighlights();
-                tile.transform.GetComponent<Renderer>().material = IsTileActive(tilePos) ? activeGrid.activeUnselected : activeGrid.unselected;
+                tile.transform.GetComponent<Renderer>().material = IsTileActive(selectedGrid, tilePos) ? activeGrid.activeUnselected : activeGrid.unselected;
                 Debug.Log("Character on " + tile.name + " has been unselected");
                 charSelected = false;
                 charCard.Close();
@@ -457,7 +453,7 @@ public class BattleEngine : MonoBehaviour
                     var tileScript = tile.GetComponent<Tile>();
                     if(tileScript.passable) {
                         tileScript.highlighted = true;
-                        tile.GetComponent<Renderer>().material = IsTileActive(tilePos) ? activeGrid.activeHighlighted : activeGrid.abilityHighlighted;
+                        tile.GetComponent<Renderer>().material = IsTileActive(activeGrid, tilePos) ? activeGrid.activeHighlighted : activeGrid.abilityHighlighted;
                     }
                 }
             }
@@ -490,11 +486,6 @@ public class BattleEngine : MonoBehaviour
         if(root.Down != null) HighlightPathTree(root.Down);
         if(root.Left != null) HighlightPathTree(root.Left);
         if(root.Right != null) HighlightPathTree(root.Right);
-    }
-    
-    public bool IsTileActive(Vector2Int tilePos)
-    {
-        return IsTileActive(activeGrid, tilePos);
     }
 
     public bool IsTileActive(Grid grid, Vector2Int tilePos) {
@@ -618,37 +609,13 @@ public class BattleEngine : MonoBehaviour
     {
         if (interactable)
         {
+            ResetAllHighlights();
+
             activeGrid.GetTileAtPos(activeUnitPos).GetComponent<Tile>().highlighted = false;
             activeGrid.GetTileAtPos(activeUnitPos).GetComponent<Renderer>().material = activeGrid.unselected;
             
             // Tick stat modifiers
             activeUnit.TickModifiers();
-
-            //Player turn enqueue handling - passes in the current active unit (if it is a player controlled unit), 
-            //the target of this turn's action (if any), the type of action taken this turn (if any), and whether the character moved
-            if(isPlayerTurn && selectedAbility != null && acted && playerTarget != null)
-            {
-                //Add the new PlayerAction to the playerActions queue, using the overloaded constructor
-                playerActions.Add(new PlayerAction(activeUnit, playerTarget.GetComponent<Character>(), selectedAbility, moved));
-
-                //Logging to show what was just enqueued
-                Debug.Log("AI: playerActions Enqueue: " + playerActions[playerActions.Count() - 1].GetCharacter().displayName + " " 
-                + playerActions[playerActions.Count() - 1].GetTarget().displayName + " "
-                + playerActions[playerActions.Count() - 1].GetAbility().displayName + " " 
-                + playerActions[playerActions.Count() - 1].GetMovement() 
-                + "\n" + "Queue Size: " + playerActions.Count());
-            }
-
-            //If the player didn't act, don't send in a target
-            else if(isPlayerTurn && acted == false)
-            {
-                playerActions.Add(new PlayerAction(activeUnit, selectedAbility, moved));
-
-                //Logging to show what was just enqueued
-                Debug.Log("AI: playerActions Enqueue: " + playerActions[playerActions.Count() - 1].GetCharacter().displayName + " "
-                + playerActions[playerActions.Count() - 1].GetMovement() 
-                + "\n" + "Queue Size: " + playerActions.Count());
-            }
 
             turnQueue.RemoveAt(0);
             moved = false;
@@ -669,8 +636,9 @@ public class BattleEngine : MonoBehaviour
         
         cam.GetComponent<CameraController>().SetCameraFollow(activeUnit.gameObject);
         playerShip.GetComponent<ShipController>().moveSpeed = 1.0F;
-        yield return new WaitForSecondsRealtime(0.0F);
+        yield return new WaitForSecondsRealtime(0.5F);
         playerShip.GetComponent<ShipController>().moveSpeed = 0F;
+        
         EnableCoins();
 
         // After wait
@@ -698,7 +666,7 @@ public class BattleEngine : MonoBehaviour
         // Unselect currently selected character
         if(charSelected) {
             Debug.Log("Unselecting character on " + selectedCharPos.x + " " + selectedCharPos.y);
-            selectedGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedCharPos) ? selectedGrid.activeUnselected : selectedGrid.unselected;
+            selectedGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedGrid, selectedCharPos) ? selectedGrid.activeUnselected : selectedGrid.unselected;
         }
 
         ResetAllHighlights();
@@ -717,9 +685,10 @@ public class BattleEngine : MonoBehaviour
         }
 
         // Select new tile at tile pos
-        selectRend.material = IsTileActive(tilePos) ? activeGrid.activeSelected : activeGrid.selected;
+        selectedGrid = tile.grid;
+        tile.highlighted = true;
+        selectRend.material = IsTileActive(selectedGrid, tilePos) ? selectedGrid.activeSelected : selectedGrid.selected;
         selectedCharPos = tilePos;
-        selectedGrid = activeGrid;
 
         Debug.Log("Character on " + tile.name + " has been selected");
 
@@ -867,7 +836,7 @@ public class BattleEngine : MonoBehaviour
         {
             activeUnitPos = newPos;
             activeUnitTile = activeGrid.GetTileAtPos(newPos).GetComponent<Tile>();
-            activeGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
+            selectedGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedGrid, selectedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
             selectedCharPos = newPos;
         }
         ResetAllHighlights();
@@ -877,9 +846,6 @@ public class BattleEngine : MonoBehaviour
             selectedAbility.AffectCharacters(activeUnit, characters, i);
             yield return new WaitForSecondsRealtime(0.6f);
         }
-
-        //AI: Forward the target(s) to AI handler for enqueue. Currently only forwards one character - for refactoring later
-        if(characters.Count > 0) playerTarget = characters[0].gameObject;
 
         // ----- Combo Attacks ------
         if(TryComboAttack(activeUnitPos, tilePos, false)) yield return new WaitForSecondsRealtime(0.6f);
@@ -949,7 +915,7 @@ public class BattleEngine : MonoBehaviour
     public bool MoveUnit(Tile tile, bool simulate = false)
     {
         Vector2Int tilePos = tile.position;
-        if(!moved && moving && charSelected && activeUnit.gameObject == activeGrid.GetCharacterAtPos(selectedCharPos) && tilePos != selectedCharPos) 
+        if(!moved && moving && charSelected && activeUnit.gameObject == selectedGrid.GetCharacterAtPos(selectedCharPos) && tilePos != selectedCharPos) 
         {
             // Move character
             if (!activeUnit.PathToTile(tile, true, simulate))
@@ -958,7 +924,9 @@ public class BattleEngine : MonoBehaviour
                 return false;
             }
             if(simulate) return true;
-            //activeGrid = 
+            activeGrid = tile.grid;
+            activeUnitTile = tile;
+            activeUnitPos = tilePos;
             StartCoroutine(EndMoveUnit(tile));
             return true;
         }
@@ -970,7 +938,7 @@ public class BattleEngine : MonoBehaviour
         Debug.Log("Unselecting character on " + selectedCharPos.x + " " + selectedCharPos.y);
         activeUnitPos = tile.position;
         activeUnitTile = tile;
-        activeGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
+        selectedGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedGrid, selectedCharPos) ? selectedGrid.activeUnselected : selectedGrid.unselected;
         charSelected = false;
         charCard.Close();
         charHighlighted = false;
@@ -1274,6 +1242,8 @@ public class BattleEngine : MonoBehaviour
     }
 
     public void SelectCoin(GameObject coin, Animator animator, bool value) {
+        if(activeCoin != null) activeCoin.transform.GetChild(0).gameObject.SetActive(false); //Disable text of old coin
+        activeCoin = coin;
         animator.SetBool(Selected, value);
         coin.transform.GetChild(0).gameObject.SetActive(value); //Set text
     }

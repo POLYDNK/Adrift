@@ -443,7 +443,6 @@ MonoBehaviour:
   backgroundAlly: {fileID: 21300000, guid: c8e092c70d2a19640b590e93752f589b, type: 3}
   backgroundEnemy: {fileID: 21300000, guid: 2fc94d3a9abf21d43b1522cf95869e0a, type: 3}
   myChar: {fileID: 0}
-  charScript: {fileID: 0}
   myHealthBar: {fileID: 8372320732285518797}
   updateChar: 0
 --- !u!1 &8030575021792134611
