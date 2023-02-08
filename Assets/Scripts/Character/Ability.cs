@@ -190,14 +190,14 @@ public class Ability : ScriptableObject
     }
 
     // Apply ability to target character
-    public void AffectCharacter(GameObject user, GameObject target, int currentHit) {
-        CallAbility(user.GetComponent<Character>(), target.GetComponent<Character>(), currentHit);
+    public void AffectCharacter(Character user, Character target, int currentHit) {
+        CallAbility(user, target, currentHit);
     }
 
     // Apply ability to target list of characters
-    public void AffectCharacters(GameObject user, List<GameObject> targets, int currentHit) {
-        foreach(GameObject target in targets) {
-            CallAbility(user.GetComponent<Character>(), target.GetComponent<Character>(), currentHit);
+    public void AffectCharacters(Character user, List<Character> targets, int currentHit) {
+        foreach(Character target in targets) {
+            CallAbility(user, target, currentHit);
         }
     }
 

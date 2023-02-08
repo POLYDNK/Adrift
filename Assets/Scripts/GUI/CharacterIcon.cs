@@ -9,8 +9,7 @@ public class CharacterIcon : MonoBehaviour
     [SerializeField] public BattleEngine battleScript;
     [SerializeField] public TMP_Text turnOrderText;
     [SerializeField] public Sprite backgroundAlly, backgroundEnemy;
-    public GameObject myChar;
-    public Character charScript = null;
+    public Character myChar;
     public RectangleBar myHealthBar;
     [FormerlySerializedAs("UpdateChar")] public bool updateChar = false;
 
@@ -20,16 +19,15 @@ public class CharacterIcon : MonoBehaviour
         // On character update for this icon
         if (updateChar)
         {
-            charScript = myChar.GetComponent<Character>();
             transform.GetChild(2).GetChild(0).GetComponent<RectangleBar>().gradient = Character.HealthBarGradient(BattleEngine.IsAllyUnit(myChar));
             updateChar = false;
         }
 
         // Update healthbar
-        if (charScript != null)
+        if (myChar != null)
         {
-            myHealthBar.SetMaxHealth(charScript.GetMaxHp());
-            myHealthBar.SetHealth(charScript.hp);
+            myHealthBar.SetMaxHealth(myChar.GetMaxHp());
+            myHealthBar.SetHealth(myChar.hp);
         }
     }
 
@@ -38,11 +36,11 @@ public class CharacterIcon : MonoBehaviour
         if (myChar != null)
         {
             // Get Tile
-            Vector2Int tilePos = charScript.gridPosition;
-            GameObject myTile = charScript.myGrid.GetComponent<Grid>().GetTileAtPos(tilePos);
+            Vector2Int tilePos = myChar.gridPosition;
+            GameObject myTile = myChar.myGrid.GetComponent<Grid>().GetTileAtPos(tilePos);
 
             // Select Char
-            battleScript.SelectCharacter(myTile);
+            battleScript.SelectCharacter(myTile.GetComponent<Tile>());
         }
     }
 

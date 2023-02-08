@@ -63,14 +63,14 @@ public class CannonObject : GridObject
     }
 
     // Trigger this object's primary behavior when interacted with by a character, return created object to track with camera
-    new public GameObject InteractPrimary(GameObject user)
+    new public GameObject InteractPrimary(Character user)
     {
         Debug.Log("Fire Cannonball!");
-        return FireCannonball(!user.GetComponent<Character>().IsPlayer());
+        return FireCannonball(!user.IsPlayer());
     }
 
     // Trigger this object's secondary behavior when interacted with by a character, return created object to track with camera
-    new public GameObject InteractSecondary(GameObject user)
+    new public GameObject InteractSecondary(Character user)
     {
         Debug.Log("Fire User!");
         var rigidBody = user.transform.GetChild(0);

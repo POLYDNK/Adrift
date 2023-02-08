@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
@@ -33,7 +34,7 @@ public class BattleEngine : MonoBehaviour
 
     public List<Grid> boardableGrids = new(); //Grids that can be boarded via movement, automatically adds ships
     public GameObject playerCrew, enemyCrew, playerShip, enemyShip; //Crews & ships
-    public List<GameObject> units = new(); //All units
+    public List<Character> units = new(); //All units
     public PathTreeNode activePathRoot;
     public bool active = false; //Activation flag to be set by other systems
     public bool interactable = true; //Flag used for locking actions during events
@@ -46,12 +47,13 @@ public class BattleEngine : MonoBehaviour
     private bool moved = false; //Whether movement was taken
     private bool acted = false; //Whether an action was taken
     private int turnCount = 0;
-    public GameObject activeUnit, activeUnitTile;
+    public Character activeUnit;
+    public Tile activeUnitTile;
     public Grid activeGrid; //Grid that active unit is on
     public Vector2Int activeUnitPos;
-    public List<GameObject> aliveUnits = new();
-    public List<GameObject> deadUnits = new();
-    public List<GameObject> turnQueue = new(); //Stored units in the turn queue (units can repeat)
+    public List<Character> aliveUnits = new();
+    public List<Character> deadUnits = new();
+    public List<Character> turnQueue = new(); //Stored units in the turn queue (units can repeat)
 
     //UI references
     [SerializeField] public CharacterCard charCard;
@@ -95,8 +97,8 @@ public class BattleEngine : MonoBehaviour
         AIController = new EnemyAIController(this);
 
         // Temporary assignment of ships, crews should be passed in somewhere since they're permanent
-        playerCrew.GetComponent<Crew>().ship = playerShip;
-        enemyCrew.GetComponent<Crew>().ship = enemyShip;
+        playerCrew.GetComponent<Crew>().ship = playerShip.GetComponent<Ship>();
+        enemyCrew.GetComponent<Crew>().ship = enemyShip.GetComponent<Ship>();
         
         // Add ship decks to boarding grids
         boardableGrids.Add(DataUtil.RecursiveFind(playerShip.transform, "DeckGrid").gameObject.GetComponent<Grid>());
@@ -230,7 +232,7 @@ public class BattleEngine : MonoBehaviour
                                 // If a tile has a character on it, then we can only select it
                                 if (tileScript.hasCharacter)
                                 {
-                                    SelectCharacter(objectHit.gameObject);
+                                    SelectCharacter(objectHit.gameObject.GetComponent<Tile>());
                                 }
                                 // If we have a selected character/tile, then we can move it to any
                                 // highlighted tile without a character already on it
@@ -338,8 +340,8 @@ public class BattleEngine : MonoBehaviour
         GameObject[] characters = GameObject.FindGameObjectsWithTag("Character");
         foreach (GameObject character in characters)
         {
-            units.Add(character);
-            aliveUnits.Add(character);
+            units.Add(character.GetComponent<Character>());
+            aliveUnits.Add(character.GetComponent<Character>());
         }
 
         // Apply morale modifiers
@@ -385,11 +387,10 @@ public class BattleEngine : MonoBehaviour
         }
     }
 
-    public void SelectCharacter(GameObject tile) {
-        Tile tileScript = tile.GetComponent<Tile>();
-        var tilePos = tileScript.position;
+    public void SelectCharacter(Tile tile) {
+        var tilePos = tile.position;
         // If a tile has a character on it, then we can only select it
-        if (tileScript.hasCharacter)
+        if (tile.hasCharacter)
         {
             // Move Camera to clicked character
             cam.GetComponent<CameraController>().LookAtPos(tile.transform.position);
@@ -467,7 +468,7 @@ public class BattleEngine : MonoBehaviour
     public void HighlightValidMoves(Vector2Int pos, int range)
     {
         // Only highlight if the character at pos is the active unit
-        if(activeGrid.GetCharacterAtPos(pos) == activeUnit)
+        if(activeGrid.GetCharacterAtPos(pos) == activeUnit.gameObject)
         {
             // Highlight move tiles
             ResetAllHighlights();
@@ -497,7 +498,7 @@ public class BattleEngine : MonoBehaviour
     }
 
     public bool IsTileActive(Grid grid, Vector2Int tilePos) {
-        return grid.Tiles[tilePos.x, tilePos.y].GetComponent<Tile>().characterOn == activeUnit;
+        return grid.Tiles[tilePos.x, tilePos.y].GetComponent<Tile>().characterOn == activeUnit.gameObject;
     }
 
     public void SelectAction() {
@@ -536,7 +537,7 @@ public class BattleEngine : MonoBehaviour
         //Populate list with sorted indices of units by speed over the next 50 turns
         for(int i = 1; i < 50 + turnCount; i++) {
             for(int j = 0; j < units.Count; j++) {
-                Character unit = units[j].GetComponent<Character>();
+                Character unit = units[j];
                 if(!unit.IsDead()) temp.Add(new Vector2Int(j, (51 - unit.GetSpeed()) * i));
             }
         }
@@ -562,7 +563,7 @@ public class BattleEngine : MonoBehaviour
 
         // Get active unit script
         activeUnit = turnQueue[0];
-        var activeUnitScript = activeUnit.GetComponent<Character>();
+        var activeUnitScript = activeUnit;
 
         // Recover 1 AP
         activeUnitScript.AddAP(1);
@@ -573,14 +574,14 @@ public class BattleEngine : MonoBehaviour
 
         // Camera Culling
         var camScript = cam.GetComponent<CameraController>();
-        camScript.SetLayerMode((CameraController.Layermode)activeUnit.layer);
+        camScript.SetLayerMode((CameraController.Layermode)activeUnit.gameObject.layer);
 
         // Deselect ability
         selectedAbility = null;
         usedAbilities.Clear();
         
         // Set the tile of which the character is on to be active
-        activeUnitTile = activeGrid.Tiles[activeUnitPos.x, activeUnitPos.y];
+        activeUnitTile = activeGrid.Tiles[activeUnitPos.x, activeUnitPos.y].GetComponent<Tile>();
         activeUnitTile.GetComponent<Renderer>().material = activeGrid.activeUnselected;
         camScript.LookAtPos(activeUnitTile.transform.position);
 
@@ -621,14 +622,14 @@ public class BattleEngine : MonoBehaviour
             activeGrid.GetTileAtPos(activeUnitPos).GetComponent<Renderer>().material = activeGrid.unselected;
             
             // Tick stat modifiers
-            activeUnit.GetComponent<Character>().TickModifiers();
+            activeUnit.TickModifiers();
 
             //Player turn enqueue handling - passes in the current active unit (if it is a player controlled unit), 
             //the target of this turn's action (if any), the type of action taken this turn (if any), and whether the character moved
             if(isPlayerTurn && selectedAbility != null && acted && playerTarget != null)
             {
                 //Add the new PlayerAction to the playerActions queue, using the overloaded constructor
-                playerActions.Add(new PlayerAction(activeUnit.GetComponent<Character>(), playerTarget.GetComponent<Character>(), selectedAbility, moved));
+                playerActions.Add(new PlayerAction(activeUnit, playerTarget.GetComponent<Character>(), selectedAbility, moved));
 
                 //Logging to show what was just enqueued
                 Debug.Log("AI: playerActions Enqueue: " + playerActions[playerActions.Count() - 1].GetCharacter().displayName + " " 
@@ -641,7 +642,7 @@ public class BattleEngine : MonoBehaviour
             //If the player didn't act, don't send in a target
             else if(isPlayerTurn && acted == false)
             {
-                playerActions.Add(new PlayerAction(activeUnit.GetComponent<Character>(), selectedAbility, moved));
+                playerActions.Add(new PlayerAction(activeUnit, selectedAbility, moved));
 
                 //Logging to show what was just enqueued
                 Debug.Log("AI: playerActions Enqueue: " + playerActions[playerActions.Count() - 1].GetCharacter().displayName + " "
@@ -666,9 +667,9 @@ public class BattleEngine : MonoBehaviour
 
         DisableCoins();
         
-        cam.GetComponent<CameraController>().SetCameraFollow(activeUnit);
-        playerShip.GetComponent<ShipController>().moveSpeed = 1.5F;
-        yield return new WaitForSecondsRealtime(0F);
+        cam.GetComponent<CameraController>().SetCameraFollow(activeUnit.gameObject);
+        playerShip.GetComponent<ShipController>().moveSpeed = 1.0F;
+        yield return new WaitForSecondsRealtime(0.0F);
         playerShip.GetComponent<ShipController>().moveSpeed = 0F;
         EnableCoins();
 
@@ -679,21 +680,20 @@ public class BattleEngine : MonoBehaviour
         PickNewTurn();
     }
 
-    public void SetupMove(GameObject objectTile) 
+    public void SetupMove(Tile tile) 
     {
-        SetupActionOrMove(objectTile, false);
+        SetupActionOrMove(tile, false);
     }
 
-    public void SetupAction(GameObject objectTile)
+    public void SetupAction(Tile tile)
     {
-        SetupActionOrMove(objectTile, true);
+        SetupActionOrMove(tile, true);
     }
 
-    private void SetupActionOrMove(GameObject tile, bool isAction)
+    private void SetupActionOrMove(Tile tile, bool isAction)
     {
-        var selectRend  = tile.GetComponent<Renderer>();
-        var tileScript  = tile.GetComponent<Tile>();
-        Vector2Int tilePos = tileScript.position;
+        var selectRend  = tile.gameObject.GetComponent<Renderer>();
+        Vector2Int tilePos = tile.position;
 
         // Unselect currently selected character
         if(charSelected) {
@@ -711,8 +711,8 @@ public class BattleEngine : MonoBehaviour
         {
             if(!moved)
             {
-                cam.GetComponent<CameraController>().SetCameraFollow(tileScript.characterOn);
-                HighlightValidMoves(tilePos, tileScript.characterOn.GetComponent<Character>().GetMovement());
+                cam.GetComponent<CameraController>().SetCameraFollow(tile.characterOn);
+                HighlightValidMoves(tilePos, tile.characterOn.GetComponent<Character>().GetMovement());
             }
         }
 
@@ -725,7 +725,7 @@ public class BattleEngine : MonoBehaviour
 
         // Selection Logic
         charSelected = true;
-        charCard.Open(tileScript.characterOn.GetComponent<Character>());
+        charCard.Open(tile.characterOn.GetComponent<Character>());
         charHighlighted = false;
     }
 
@@ -733,7 +733,7 @@ public class BattleEngine : MonoBehaviour
     public bool ActUnit(Vector2Int tilePos, bool simulate = false) 
     {
         // Get scripts + vars
-        Character  activeCharScript = activeUnit.GetComponent<Character>();
+        Character  activeCharScript = activeUnit;
         Tile tileScript = activeGrid.GetTileAtPos(tilePos).GetComponent<Tile>();
         GameObject selectedCharacter = null;
 
@@ -767,7 +767,7 @@ public class BattleEngine : MonoBehaviour
         Debug.Log("Moving: " + moving.ToString()
                              + " || Acted: " + acted.ToString()
                              + " || Selected Ability: " + selectedAbility.displayName 
-                             + " || activeUnit AP: " + activeUnit.GetComponent<Character>().ap
+                             + " || activeUnit AP: " + activeUnit.ap
                              + " || Selected Ability Cost: " + selectedAbility.costAP);
 
         // Calculate manhattan distance.
@@ -821,7 +821,7 @@ public class BattleEngine : MonoBehaviour
             return true;
         }
 
-        List<GameObject> characters = new List<GameObject>();
+        List<Character> characters = new();
 
         //Select characters based on ability shape
         foreach(Vector2Int pos in selectedAbility.GetRelativeShape(xDist, yDist))
@@ -834,7 +834,7 @@ public class BattleEngine : MonoBehaviour
             {
                 if(selectedAbility.friendly && !AllianceChecker(activeGrid.GetCharacterAtPos(selPos))) continue;
                 if(!selectedAbility.friendly && AllianceChecker(activeGrid.GetCharacterAtPos(selPos))) continue;
-                characters.Add(selTileScript.characterOn);
+                characters.Add(selTileScript.characterOn.GetComponent<Character>());
             }
         }
 
@@ -846,27 +846,27 @@ public class BattleEngine : MonoBehaviour
         return true;
     }
 
-    IEnumerator EndActUnit(Vector2Int tilePos, List<GameObject> characters, int xDist, int yDist) {
+    IEnumerator EndActUnit(Vector2Int tilePos, List<Character> characters, int xDist, int yDist) {
         DisableCoins();
-        foreach(GameObject unit in aliveUnits) if(unit != activeUnit && !characters.Contains(unit)) unit.GetComponent<Character>().HideBars();
+        foreach(Character unit in aliveUnits) if(unit != activeUnit && !characters.Contains(unit)) unit.HideBars();
         foreach(Button button in actionButtons)
         {
             button.interactable = false;
             button.gameObject.GetComponentInChildren<TMPro.TextMeshProUGUI>().color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
         }
-        if(tilePos != activeUnitPos) yield return new WaitWhile(() => !activeUnit.GetComponent<Character>().RotateTowards(activeGrid.GetTileAtPos(tilePos).transform.position)); //Wait for rotation first
+        if(tilePos != activeUnitPos) yield return new WaitWhile(() => !activeUnit.RotateTowards(activeGrid.GetTileAtPos(tilePos).transform.position)); //Wait for rotation first
 
         //Pull and knockback
         if(selectedAbility.knockback != 0)
         {
-            foreach(GameObject character in characters) selectedAbility.ApplyKnockback(character.GetComponent<Character>(), activeGrid, xDist, yDist);
+            foreach(var character in characters) selectedAbility.ApplyKnockback(character, activeGrid, xDist, yDist);
         }
         //Self movement
-        Vector2Int newPos = selectedAbility.ApplySelfMovement(activeUnit.GetComponent<Character>(), activeGrid, xDist, yDist);
+        Vector2Int newPos = selectedAbility.ApplySelfMovement(activeUnit, activeGrid, xDist, yDist);
         if(newPos != activeUnitPos)
         {
             activeUnitPos = newPos;
-            activeUnitTile = activeGrid.GetTileAtPos(newPos);
+            activeUnitTile = activeGrid.GetTileAtPos(newPos).GetComponent<Tile>();
             activeGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
             selectedCharPos = newPos;
         }
@@ -879,13 +879,13 @@ public class BattleEngine : MonoBehaviour
         }
 
         //AI: Forward the target(s) to AI handler for enqueue. Currently only forwards one character - for refactoring later
-        if(characters.Count > 0) playerTarget = characters[0];
+        if(characters.Count > 0) playerTarget = characters[0].gameObject;
 
         // ----- Combo Attacks ------
         if(TryComboAttack(activeUnitPos, tilePos, false)) yield return new WaitForSecondsRealtime(0.6f);
         // --------------------------
 
-        foreach(GameObject unit in aliveUnits) unit.GetComponent<Character>().ShowBars();
+        foreach(Character unit in aliveUnits) unit.ShowBars();
         EnableCoins();
         if(!acted) {
             actionButtons[0].onClick.Invoke();
@@ -907,30 +907,30 @@ public class BattleEngine : MonoBehaviour
         {
             if(Mathf.Abs(xDist) > Mathf.Abs(yDist))
             { //Horizontal cases
-                if(xDist > 0) return HandleComboAttack(activeGrid.GetTileWest(selectedPos), tileScript.characterOn, simulate);
-                else return HandleComboAttack(activeGrid.GetTileEast(selectedPos), tileScript.characterOn, simulate);
+                if(xDist > 0) return HandleComboAttack(activeGrid.GetTileWest(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
+                else return HandleComboAttack(activeGrid.GetTileEast(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
             }
             else
             { //Vertical cases
-                if(yDist > 0) return HandleComboAttack(activeGrid.GetTileSouth(selectedPos), tileScript.characterOn, simulate);
-                else return HandleComboAttack(activeGrid.GetTileNorth(selectedPos), tileScript.characterOn, simulate);
+                if(yDist > 0) return HandleComboAttack(activeGrid.GetTileSouth(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
+                else return HandleComboAttack(activeGrid.GetTileNorth(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
             }
         }
         return false;
     }
 
     //Try to perform a combo attack from the specified character to the target
-    private bool HandleComboAttack(GameObject characterTile, GameObject targetCharacter, bool simulate) {
+    private bool HandleComboAttack(GameObject characterTile, Character targetCharacter, bool simulate) {
         if(characterTile != null && targetCharacter != null)
         {
             Tile tile = characterTile.GetComponent<Tile>();
-            Vector2Int targetPos = targetCharacter.GetComponent<Character>().gridPosition;
-            if(tile.hasCharacter && IsAllyUnit(tile.characterOn) != IsAllyUnit(targetCharacter) && Mathf.Abs(tile.position.x - targetPos.x) + Mathf.Abs(tile.position.y - targetPos.y) == 1) //Need target on opposite team
+            Vector2Int targetPos = targetCharacter.gridPosition;
+            if(tile.hasCharacter && IsAllyUnit(tile.characterOn.GetComponent<Character>()) != IsAllyUnit(targetCharacter) && Mathf.Abs(tile.position.x - targetPos.x) + Mathf.Abs(tile.position.y - targetPos.y) == 1) //Need target on opposite team
             {
                 if(!simulate)
                 {
                     Debug.Log("Triggering combo attack...");
-                    StartCoroutine(EndComboAttack(tile.characterOn, targetCharacter));
+                    StartCoroutine(EndComboAttack(tile.characterOn.GetComponent<Character>(), targetCharacter));
                 }
                 return true;
             }
@@ -938,9 +938,9 @@ public class BattleEngine : MonoBehaviour
         return false;
     }
 
-    IEnumerator EndComboAttack(GameObject user, GameObject target)
+    IEnumerator EndComboAttack(Character user, Character target)
     {
-        yield return new WaitWhile(() => !user.GetComponent<Character>().RotateTowards(target.GetComponent<Character>().GetTileObject().transform.position)); //Wait for rotation first
+        yield return new WaitWhile(() => !user.RotateTowards(target.GetTileObject().transform.position)); //Wait for rotation first
         GetComboAttack(user).AffectCharacter(user, target, 0);
         yield break;
     }
@@ -949,15 +949,16 @@ public class BattleEngine : MonoBehaviour
     public bool MoveUnit(Tile tile, bool simulate = false)
     {
         Vector2Int tilePos = tile.position;
-        if(!moved && moving && charSelected && activeUnit == activeGrid.GetCharacterAtPos(selectedCharPos) && tilePos != selectedCharPos) 
+        if(!moved && moving && charSelected && activeUnit.gameObject == activeGrid.GetCharacterAtPos(selectedCharPos) && tilePos != selectedCharPos) 
         {
             // Move character
-            if (!activeUnit.GetComponent<Character>().PathToTile(tile, true))
+            if (!activeUnit.PathToTile(tile, true, simulate))
             {
                 Debug.Log("Cannot move character to tile " + tilePos.x + " " + tilePos.y);
                 return false;
             }
             if(simulate) return true;
+            //activeGrid = 
             StartCoroutine(EndMoveUnit(tile));
             return true;
         }
@@ -968,7 +969,7 @@ public class BattleEngine : MonoBehaviour
         // Unselect currently select character
         Debug.Log("Unselecting character on " + selectedCharPos.x + " " + selectedCharPos.y);
         activeUnitPos = tile.position;
-        activeUnitTile = tile.gameObject;
+        activeUnitTile = tile;
         activeGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
         charSelected = false;
         charCard.Close();
@@ -976,14 +977,14 @@ public class BattleEngine : MonoBehaviour
         ResetAllHighlights();
         moved = true;
         DisableCoins();
-        foreach(GameObject unit in aliveUnits) unit.GetComponent<Character>().HideBars();
+        foreach(Character unit in aliveUnits) unit.HideBars();
         yield return new WaitWhile(() => activeUnit.GetComponent<FollowPath>().PathToFollow.Count > 0 || activeUnit.GetComponent<FollowPath>().IsMoving());
         yield return new WaitForSecondsRealtime(0.15f);
         EnableCoins();
         if(!acted) {
             SelectAction(); //Move to action state if available
         }
-        foreach(GameObject unit in aliveUnits) unit.GetComponent<Character>().ShowBars();
+        foreach(Character unit in aliveUnits) unit.ShowBars();
         LogicUpdate();
         yield break;
     }
@@ -1019,7 +1020,7 @@ public class BattleEngine : MonoBehaviour
     public void LogicUpdate() {
         if(isPlayerTurn) RefreshActionButtons();
         //Collect any dead units
-        foreach(GameObject unit in units) {
+        foreach(Character unit in units) {
             if(!IsUnitAlive(unit)) {
                 if(activeGrid.RemoveCharacter(unit)) {
                     deadUnits.Add(unit);
@@ -1034,7 +1035,7 @@ public class BattleEngine : MonoBehaviour
                 }
             }
         }
-        foreach(GameObject unit in deadUnits) aliveUnits.Remove(unit);
+        foreach(Character unit in deadUnits) aliveUnits.Remove(unit);
         playerShipBar.SetHealth(GetPlayerCrew().GetShip().hp);
         enemyShipBar.SetHealth(GetEnemyCrew().GetShip().hp);
         playerMoraleBar.SetHealth(GetPlayerCrew().morale);
@@ -1085,7 +1086,7 @@ public class BattleEngine : MonoBehaviour
     private void CheckVictory() {
         bool won = true;
         //Check if any enemies are alive
-        foreach(GameObject unit in aliveUnits) {
+        foreach(Character unit in aliveUnits) {
             if(!IsAllyUnit(unit)) {
                 won = false;
                 break;
@@ -1104,7 +1105,7 @@ public class BattleEngine : MonoBehaviour
     private void CheckDefeat() {
         bool loss = true;
         //Check if any allies are alive
-        foreach(GameObject unit in aliveUnits) {
+        foreach(Character unit in aliveUnits) {
             if(IsAllyUnit(unit)) {
                 loss = false;
                 break;
@@ -1140,20 +1141,20 @@ public class BattleEngine : MonoBehaviour
         surrendered = true;
     }
 
-    public static bool IsUnitAlive(GameObject unit) {
-        return !unit.GetComponent<Character>().IsDead();
+    public static bool IsUnitAlive(Character unit) {
+        return !unit.IsDead();
     }
 
-    public static bool IsAllyUnit(GameObject unit) {
-        return unit.GetComponent<Character>().crew.GetComponent<Crew>().isPlayer;
+    public static bool IsAllyUnit(Character unit) {
+        return unit.crew.GetComponent<Crew>().isPlayer;
     }
 
-    public static Ability GetBasicAttack(GameObject unit) {
-        return unit.GetComponent<Character>().basicAttack;
+    public static Ability GetBasicAttack(Character unit) {
+        return unit.basicAttack;
     }
 
-    public static Ability GetComboAttack(GameObject unit) {
-        return unit.GetComponent<Character>().comboAttack;
+    public static Ability GetComboAttack(Character unit) {
+        return unit.comboAttack;
     }
 
     public Crew GetPlayerCrew() {
@@ -1175,7 +1176,7 @@ public class BattleEngine : MonoBehaviour
         if(acted) return;
 
         int count = 0;
-        var activeChar = activeUnit.GetComponent<Character>();
+        var activeChar = activeUnit;
         //Setup action buttons
         foreach(Ability ability in activeChar.GetBattleAbilities()) {
             GameObject actionButton = Instantiate(buttonPrefab, canvas.transform);
@@ -1187,7 +1188,7 @@ public class BattleEngine : MonoBehaviour
                 SetupAction(activeUnitTile);
             });
 
-            button.interactable = !usedAbilities.Contains(ability) && activeUnit.GetComponent<Character>().ap >= ability.costAP; //Only allow ability selection if it wasn't used already and AP is available
+            button.interactable = !usedAbilities.Contains(ability) && activeUnit.ap >= ability.costAP; //Only allow ability selection if it wasn't used already and AP is available
             var tmp = actionButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             if(!button.interactable) tmp.color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
             tmp.text = ability.displayName; //Set button name to ability name
@@ -1237,8 +1238,7 @@ public class BattleEngine : MonoBehaviour
         }
 
         //Setup travel button
-        var activeUnitTileScript = activeUnitTile.GetComponent<Tile>();
-        if(activeUnitTileScript.hasGridLink)
+        if(activeUnitTile.hasGridLink)
         {
             GameObject actionButton = Instantiate(buttonPrefab, canvas.transform);
             actionButton.transform.GetComponent<RectTransform>().anchoredPosition += new Vector2(70, -90 - 25 * count);
@@ -1315,12 +1315,11 @@ public class BattleEngine : MonoBehaviour
     {
         Debug.Log("doAITurn: AI Turn began");
 
-        //StartCoroutine(aiTurnWaiter());
-        await AIController.PerformTurn(activeUnit.GetComponent<Character>(), 2000, 2000);
+        await AIController.PerformTurn(activeUnit, 2000, 2000);
     }
 
     public bool AllianceChecker(GameObject unit) 
     {
-        return unit.GetComponent<Character>().IsPlayer() == activeUnit.GetComponent<Character>().IsPlayer();
+        return unit.GetComponent<Character>().IsPlayer() == activeUnit.IsPlayer();
     }
 }

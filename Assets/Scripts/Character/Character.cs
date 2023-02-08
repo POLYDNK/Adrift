@@ -281,7 +281,7 @@ public class Character : MonoBehaviour
     // @arg: destTile   - grid tile to move the character to
     // @ret: bool      - whether the move is successful or not
     // --------------------------------------------------------------
-    public bool PathToTile(Tile destTile, bool onlyHighlighted)
+    public bool PathToTile(Tile destTile, bool onlyHighlighted, bool simulate = false)
     {
         bool moveSuccess = false;
         
@@ -299,6 +299,7 @@ public class Character : MonoBehaviour
             // Only move to highlighted tiles
             if (!onlyHighlighted || destTileScript.highlighted)
             {
+                if (simulate) return true;
                 Debug.Log("Moving character to tile " + destPos.x + " " + destPos.y);
 
                 // Move character to destPos
@@ -315,6 +316,7 @@ public class Character : MonoBehaviour
                 destTileScript.hasCharacter = true;
                 destTileScript.characterOn = this.gameObject;
 
+                myGrid = destTile.grid.gameObject;
                 gridPosition = destPos;
 
                 moveSuccess = true;

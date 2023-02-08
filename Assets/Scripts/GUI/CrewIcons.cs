@@ -31,7 +31,7 @@ public class CrewIcons : MonoBehaviour
             Debug.Log("Updating crew icons...");
 
             // For every character
-            foreach (GameObject unit in battleScript.units)
+            foreach (Character unit in battleScript.units)
             {
                 bool isNewIcon = true;
 

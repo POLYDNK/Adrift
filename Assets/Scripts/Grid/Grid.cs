@@ -330,11 +330,11 @@ public class Grid : MonoBehaviour
 
     // --------------------------------------------------------------
 
-    public bool RemoveCharacter(GameObject character) {
+    public bool RemoveCharacter(Character character) {
         Vector2Int tilePos = character.GetComponent<Character>().gridPosition;
         var tile = GetTileAtPos(tilePos).GetComponent<Tile>();
-        if(tile.characterOn == character) {
-            character.GetComponent<Character>().RemoveFromGrid();
+        if(tile.characterOn == character.gameObject) {
+            character.RemoveFromGrid();
             tile.characterOn = null;
             tile.hasCharacter = false;
             return true;
@@ -891,21 +891,20 @@ public class Grid : MonoBehaviour
         return tileObjects;
     }
 
-    public void MoveUnitToGrid(GameObject unitTile)
+    public void MoveUnitToGrid(Tile unitTile)
     {
-        Tile unitTileScript = unitTile.GetComponent<Tile>();
         // ----- Move the active character to the other grid -----
         Debug.Log("Moving character to another grid");
 
         // Add character to target grid
-        unitTileScript.targetGrid.SpawnCharacter(unitTileScript.characterOn, unitTileScript.targetTile.position, false);
+        unitTile.targetGrid.SpawnCharacter(unitTile.characterOn, unitTile.targetTile.position, false);
 
         // Camera culling
-        unitTileScript.characterOn.layer = unitTileScript.targetGrid.gridLayer;
-        cam.gameObject.GetComponent<CameraController>().SetLayerMode((CameraController.Layermode)unitTileScript.characterOn.layer);
+        unitTile.characterOn.layer = unitTile.targetGrid.gridLayer;
+        cam.gameObject.GetComponent<CameraController>().SetLayerMode((CameraController.Layermode)unitTile.characterOn.layer);
 
         // Remove character from current grid
-        unitTileScript.characterOn = null;
-        unitTileScript.hasCharacter = false;
+        unitTile.characterOn = null;
+        unitTile.hasCharacter = false;
     }
 }

@@ -13,7 +13,7 @@ public static class HeatmapGenerator
     private static int highScore;
     private static float timer;
 
-    public static void GenerateHeatmap(List<GameObject> allUnits, GameObject activeUnit)
+    public static void GenerateHeatmap(List<Character> allUnits, Character activeUnit)
     {
         timer = Time.time;
         Debug.Log("GenerateHeatmap: Generating heatmap...");
@@ -24,25 +24,22 @@ public static class HeatmapGenerator
         ResetHeatValues();
 
         // Get active char script
-        activeChar = activeUnit.GetComponent<Character>();
+        activeChar = activeUnit;
         activeTileObj = activeChar.myGrid.GetComponent<Grid>().GetTileAtPos(activeChar.gridPosition);
         activeTile = activeTileObj.GetComponent<Tile>();
 
         // Generate heat around the tiles of all units based on what
         // abilities the active character can use
-        foreach (GameObject unit in allUnits)
+        foreach (Character unit in allUnits)
         {
             // Do not include active char for ability search
             if (unit != activeUnit)
             {
-                // Get character script
-                Character charScript = unit.GetComponent<Character>();
-
                 // Set current grid
-                currentGrid = charScript.myGrid.GetComponent<Grid>();
+                currentGrid = unit.myGrid.GetComponent<Grid>();
 
                 // Ability Heat
-                AllAbilityHeat(charScript);
+                AllAbilityHeat(unit);
             }
         }
 

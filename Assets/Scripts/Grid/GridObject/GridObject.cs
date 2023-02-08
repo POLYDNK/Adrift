@@ -30,14 +30,14 @@ public class GridObject : MonoBehaviour
     }
 
     // Trigger this object's primary behavior when interacted with by a character, return created object to track with camera
-    public GameObject InteractPrimary(GameObject user)
+    public GameObject InteractPrimary(Character user)
     {
         Debug.Log("Empty primary");
         return null;
     }
 
     // Trigger this object's secondary behavior when interacted with by a character, return created object to track with camera
-    public GameObject InteractSecondary(GameObject user)
+    public GameObject InteractSecondary(Character user)
     {
         Debug.Log("Empty secondary");
         return null;

@@ -17,7 +17,7 @@ public class Crew : MonoBehaviour
 {
     public bool isPlayer; //Whether this crew is a player crew (do not change this in code)
     public List<GameObject> characters; //List of all characters in this crew
-    public GameObject ship; //Ship belonging to this crew
+    public Ship ship; //Ship belonging to this crew
     public int morale = 100;
 
     [FormerlySerializedAs("inventory_gold")] public int inventoryGold =1 ;
