@@ -794,13 +794,13 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public List<GameObject> GetAllTiles() {
-        var list = new List<GameObject>();
+    public List<Tile> GetAllTiles() {
+        var list = new List<Tile>();
         for(int x = 0; x < width; x++)
         {
             for(int y = 0; y < height; y++)
             {
-                list.Add(Tiles[x,y]);
+                list.Add(Tiles[x,y].GetComponent<Tile>());
             }
         }
         return list;

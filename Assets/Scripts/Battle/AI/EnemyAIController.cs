@@ -105,13 +105,14 @@ public class EnemyAIController
             battleScript.SelectAbility(abilityToUse.GetAbility());
 
             // Get pos of target
-            Vector2Int targetPos = abilityToUse.GetTarget().gridPosition;
+            var targetTile = abilityToUse.GetTarget().GetTileObject().GetComponent<Tile>();
 
             // Call battle engine to perform action
-            battleScript.ActUnit(targetPos);
+            if (battleScript.ActUnit(targetTile)) battleScript.Acted();
+            else battleScript.EndTurn();
 
             // Set acted in the battle engine
-            battleScript.Acted();
+            //battleScript.Acted();
         }
         else
         {

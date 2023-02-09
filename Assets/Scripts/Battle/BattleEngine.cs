@@ -243,7 +243,7 @@ public class BattleEngine : MonoBehaviour
                                 }
                             }
                             // Action
-                            else ActUnit(tilePos, false);
+                            else ActUnit(tileScript, false);
                         }
                         else
                         // -------------------------------
@@ -439,18 +439,14 @@ public class BattleEngine : MonoBehaviour
     // Highlights available action tiles for abilities
     public void HighlightActionTiles(Tile highlightedTile, int range) {
         ResetAllHighlights();
-        Vector2Int pos = activeUnitPos;
-        for(int x = Mathf.Max(pos.x - range, 0); x <= pos.x + range; x++) {
-            for(int y = Mathf.Max(pos.y - range, 0); y <= pos.y + range; y++) {
-                if(Mathf.Abs(x - pos.x) + Mathf.Abs(y - pos.y) <= range) {
-                    var tilePos = new Vector2Int(x, y);
-                    var tile = activeGrid.GetTileAtPos(tilePos);
-                    if(tile == null) continue;
-                    var tileScript = tile.GetComponent<Tile>();
-                    if(tileScript.passable) {
-                        tileScript.highlighted = true;
-                        tile.GetComponent<Renderer>().material = IsTileActive(activeGrid, tilePos) ? activeGrid.activeHighlighted : activeGrid.abilityHighlighted;
-                    }
+        foreach (Grid grid in GetActiveGrids())
+        {
+            foreach (Tile tile in grid.GetAllTiles())
+            {
+                if (tile.passable && tile.GetWorldManhattanDistance(activeUnitTile.gameObject) <= range + 0.1F)
+                {
+                    tile.highlighted = true;
+                    tile.GetComponent<Renderer>().material = IsTileActive(tile.grid, tile.position) ? tile.grid.activeHighlighted : tile.grid.abilityHighlighted;
                 }
             }
         }
@@ -709,12 +705,11 @@ public class BattleEngine : MonoBehaviour
     }
 
     //Try to use the selected ability at the specified position on the grid. Returns true if action succeeds. Will not affect game state if simulate is true.
-    public bool ActUnit(Vector2Int tilePos, bool simulate = false) 
+    public bool ActUnit(Tile tile, bool simulate = false) 
     {
         // Get scripts + vars
-        Character  activeCharScript = activeUnit;
-        Tile tileScript = activeGrid.GetTileAtPos(tilePos).GetComponent<Tile>();
         GameObject selectedCharacter = null;
+        Vector2Int tilePos = tile.position;
 
         // ------- Perform Checks -------
         /*
@@ -737,7 +732,7 @@ public class BattleEngine : MonoBehaviour
             return false;
         }
 
-        if (activeCharScript.ap < selectedAbility.costAP)
+        if (activeUnit.ap < selectedAbility.costAP)
         {
             Debug.Log("ActUnit: Error! Active character doesn't have enough AP for this ability");
             return false;
@@ -750,12 +745,12 @@ public class BattleEngine : MonoBehaviour
                              + " || Selected Ability Cost: " + selectedAbility.costAP);
 
         // Calculate manhattan distance.
-        int xDist = activeCharScript.gridPosition.x - tilePos.x;
-        int yDist = activeCharScript.gridPosition.y - tilePos.y;
-        int dist = Mathf.Abs(xDist) + Mathf.Abs(yDist);
+        int xDist = Mathf.RoundToInt(activeUnitTile.transform.position.x - tile.transform.position.x);
+        int yDist = Mathf.RoundToInt(activeUnitTile.transform.position.z - tile.transform.position.z);
+        float dist = tile.GetWorldManhattanDistance(activeUnitTile.gameObject);
 
         // Test whether calculated distance exceeds ability range
-        if(dist > selectedAbility.range)
+        if(dist > selectedAbility.range + 0.1F)
         {
             Debug.Log("ActUnit: Error! Target tile is "
                 + dist.ToString()
@@ -770,26 +765,26 @@ public class BattleEngine : MonoBehaviour
             Debug.Log("ActUnit: Ability requires a target, perform validity check");
             
             //Check for valid target
-            if(!tileScript.hasCharacter)
+            if(!tile.hasCharacter)
             {
                 Debug.Log("ActUnit: Error! There's no character at the targeted grid position");
                 return false; 
             }
 
-            if(selectedAbility.friendly && !AllianceChecker(activeGrid.GetCharacterAtPos(tilePos)))
+            if(selectedAbility.friendly && !AllianceChecker(tile.characterOn))
             {
                 Debug.Log("ActUnit: Error! Friendly targeted abilities cannot target enemies");
                 return false;
             }
 
-            if(!selectedAbility.friendly && AllianceChecker(activeGrid.GetCharacterAtPos(tilePos)))
+            if(!selectedAbility.friendly && AllianceChecker(tile.characterOn))
             {
                 Debug.Log("ActUnit: Error! Enemy target abilites cannot target allies");
                 return false;
             }
 
             // Get the targeted character for selected ability
-            selectedCharacter = tileScript.characterOn;
+            selectedCharacter = tile.characterOn;
         }
         // ------------------------------
 
@@ -806,26 +801,28 @@ public class BattleEngine : MonoBehaviour
         foreach(Vector2Int pos in selectedAbility.GetRelativeShape(xDist, yDist))
         {
             Vector2Int selPos = new Vector2Int(tilePos.x + pos.x, tilePos.y + pos.y);
-            var selTile = activeGrid.GetTileAtPos(selPos);
+            var selTile = tile.grid.GetTileAtPos(selPos);
             if(selTile == null) continue;
             var selTileScript = selTile.GetComponent<Tile>();
             if(selTileScript.hasCharacter)
             {
-                if(selectedAbility.friendly && !AllianceChecker(activeGrid.GetCharacterAtPos(selPos))) continue;
-                if(!selectedAbility.friendly && AllianceChecker(activeGrid.GetCharacterAtPos(selPos))) continue;
+                if(selectedAbility.friendly && !AllianceChecker(selTileScript.characterOn)) continue;
+                if(!selectedAbility.friendly && AllianceChecker(selTileScript.characterOn)) continue;
                 characters.Add(selTileScript.characterOn.GetComponent<Character>());
             }
         }
 
         if(!selectedAbility.free) acted = true;
-        activeCharScript.AddAP(-selectedAbility.costAP);
+        activeUnit.AddAP(-selectedAbility.costAP);
         usedAbilities.Add(selectedAbility);
 
-        StartCoroutine(EndActUnit(selectedCharacter == null ? tilePos : selectedCharacter.GetComponent<Character>().gridPosition, characters, xDist, yDist));
+        StartCoroutine(EndActUnit(selectedCharacter == null ? tile : selectedCharacter.GetComponent<Character>().GetTileObject().GetComponent<Tile>(), characters, xDist, yDist));
         return true;
     }
 
-    IEnumerator EndActUnit(Vector2Int tilePos, List<Character> characters, int xDist, int yDist) {
+    IEnumerator EndActUnit(Tile tile, List<Character> characters, int xDist, int yDist)
+    {
+        Vector2Int tilePos = tile.position;
         DisableCoins();
         foreach(Character unit in aliveUnits) if(unit != activeUnit && !characters.Contains(unit)) unit.HideBars();
         foreach(Button button in actionButtons)
@@ -833,12 +830,12 @@ public class BattleEngine : MonoBehaviour
             button.interactable = false;
             button.gameObject.GetComponentInChildren<TMPro.TextMeshProUGUI>().color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
         }
-        if(tilePos != activeUnitPos) yield return new WaitWhile(() => !activeUnit.RotateTowards(activeGrid.GetTileAtPos(tilePos).transform.position)); //Wait for rotation first
+        if(!IsTileActive(tile.grid, tile.position)) yield return new WaitWhile(() => !activeUnit.RotateTowards(activeGrid.GetTileAtPos(tilePos).transform.position)); //Wait for rotation first
 
         //Pull and knockback
         if(selectedAbility.knockback != 0)
         {
-            foreach(var character in characters) selectedAbility.ApplyKnockback(character, activeGrid, xDist, yDist);
+            foreach(var character in characters) selectedAbility.ApplyKnockback(character, character.myGrid.GetComponent<Grid>(), xDist, yDist);
         }
         //Self movement
         Vector2Int newPos = selectedAbility.ApplySelfMovement(activeUnit, activeGrid, xDist, yDist);
@@ -858,7 +855,7 @@ public class BattleEngine : MonoBehaviour
         }
 
         // ----- Combo Attacks ------
-        if(TryComboAttack(activeUnitPos, tilePos, false)) yield return new WaitForSecondsRealtime(0.6f);
+        if(TryComboAttack(activeUnitTile, tile, false)) yield return new WaitForSecondsRealtime(0.6f);
         // --------------------------
 
         foreach(Character unit in aliveUnits) unit.ShowBars();
@@ -875,21 +872,21 @@ public class BattleEngine : MonoBehaviour
     }
 
     //Search for a possible combo attack and try it if not simulated. Returns true if a combo occurs.
-    public bool TryComboAttack(Vector2Int userPos, Vector2Int selectedPos, bool simulate) {
-        var tileScript = activeGrid.GetTileAtPos(selectedPos).GetComponent<Tile>();
-        int xDist = userPos.x - selectedPos.x;
-        int yDist = userPos.y - selectedPos.y;
+    public bool TryComboAttack(Tile userTile, Tile selectedTile, bool simulate) {
+        var selectedPos = selectedTile.position;
+        int xDist = Mathf.RoundToInt(activeUnitTile.transform.position.x - selectedTile.transform.position.x);
+        int yDist = Mathf.RoundToInt(activeUnitTile.transform.position.z - selectedTile.transform.position.z);
         if(selectedAbility.requiresTarget && xDist != yDist && selectedAbility.selfMovement == 0) //No diagonals
         {
             if(Mathf.Abs(xDist) > Mathf.Abs(yDist))
             { //Horizontal cases
-                if(xDist > 0) return HandleComboAttack(activeGrid.GetTileWest(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
-                else return HandleComboAttack(activeGrid.GetTileEast(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
+                if(xDist > 0) return HandleComboAttack(selectedTile.grid.GetTileWest(selectedPos), selectedTile.characterOn.GetComponent<Character>(), simulate);
+                else return HandleComboAttack(selectedTile.grid.GetTileEast(selectedPos), selectedTile.characterOn.GetComponent<Character>(), simulate);
             }
             else
             { //Vertical cases
-                if(yDist > 0) return HandleComboAttack(activeGrid.GetTileSouth(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
-                else return HandleComboAttack(activeGrid.GetTileNorth(selectedPos), tileScript.characterOn.GetComponent<Character>(), simulate);
+                if(yDist > 0) return HandleComboAttack(selectedTile.grid.GetTileSouth(selectedPos), selectedTile.characterOn.GetComponent<Character>(), simulate);
+                else return HandleComboAttack(selectedTile.grid.GetTileNorth(selectedPos), selectedTile.characterOn.GetComponent<Character>(), simulate);
             }
         }
         return false;

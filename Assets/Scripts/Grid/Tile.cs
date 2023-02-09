@@ -34,4 +34,11 @@ public class Tile : MonoBehaviour
 
     // Experimental: heat map
     public int heatVal = 0;
+
+    public float GetWorldManhattanDistance(GameObject target)
+    {
+        return Mathf.Abs(transform.position.x - target.transform.position.x)
+               + Mathf.Abs(transform.position.y - target.transform.position.y)
+               + Mathf.Abs(transform.position.z - target.transform.position.z);
+    }
 }
