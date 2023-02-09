@@ -6,7 +6,6 @@ using UnityEngine.UI;
 //DEPRECATED
 public class CannonUI : MonoBehaviour
 {
-    [SerializeField] public BattleEngine battleScript;
     [SerializeField] public Button fireCannonball;
     [SerializeField] public Button fireCharacter;
     [SerializeField] public Image fireCannonballImage;
@@ -78,25 +77,25 @@ public class CannonUI : MonoBehaviour
 
     public void FireCannon()
     {
-        if (battleScript.active)
+        if (BattleEngine.Instance.active)
         {
             // Fire Cannon
             //currCannon.transform.GetChild(0).GetComponent<CannonObject>().fireCannonball();
 
             // Sleep Battle Engine for a Moment
-            battleScript.StartCoroutine(battleScript.PauseBattleEngine(battleSleepTime, true));
+            BattleEngine.Instance.StartCoroutine(BattleEngine.Instance.PauseBattleEngine(battleSleepTime, true));
         }
     }
 
     public void FireSelf()
     {
-        if (battleScript.active)
+        if (BattleEngine.Instance.active)
         {
             // Fire Effect
             var cannonScript = currCannon.transform.GetChild(0).GetComponent<CannonObject>();
 
             // Fire Active Character
-            Transform modelTrans = battleScript.activeUnit.transform.GetChild(0);
+            Transform modelTrans = BattleEngine.Instance.activeUnit.transform.GetChild(0);
             var modelScript = modelTrans.GetComponent<CharacterCollision>();
             modelScript.WakeRigidBody();
             cannonScript.FireObject(modelTrans.gameObject);
@@ -105,19 +104,19 @@ public class CannonUI : MonoBehaviour
             camScript.SetCameraFollow(modelTrans.gameObject);
 
             // Sleep Battle Engine for a Moment
-            battleScript.StartCoroutine(battleScript.PauseBattleEngine(battleSleepTime, true));
+            BattleEngine.Instance.StartCoroutine(BattleEngine.Instance.PauseBattleEngine(battleSleepTime, true));
         }
     }
 
     private void GetAdjacentCannon()
     {
         // Only get if the active character grid pos has changed
-        if (activePos != battleScript.activeUnitPos && battleScript.init == true)
+        if (activePos != BattleEngine.Instance.activeUnitPos && BattleEngine.Instance.init == true)
         {
             Debug.Log("Searching for cannon at " + activePos.ToString());
 
-            activePos = battleScript.activeUnitPos;
-            grid = battleScript.activeGrid.gameObject;
+            activePos = BattleEngine.Instance.activeUnitPos;
+            grid = BattleEngine.Instance.activeGrid.gameObject;
             var gridScript = grid.GetComponent<Grid>();
         
             if (CheckIfCannon(gridScript.GetTileNorth(activePos)))

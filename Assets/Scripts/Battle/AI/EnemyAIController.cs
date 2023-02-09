@@ -24,10 +24,10 @@ public class EnemyAIController
     // @desc: Default constructor
     // @arg: be - Reference to the battle engine script
     // --------------------------------------------------------------
-    public EnemyAIController(BattleEngine be)
+    public EnemyAIController()
     {
         // Get battle engine script
-        battleScript = be;
+        battleScript = BattleEngine.Instance;
     }
 
     // --------------------------------------------------------------

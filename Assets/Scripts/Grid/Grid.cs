@@ -603,23 +603,8 @@ public class Grid : MonoBehaviour
 
     public PathTreeNode GetAllPathsFromTile(GameObject tile, int range, bool passThrough = false)
     {
-        // Attempt to get boarding grids from the battle engine
-        List<Grid> boardingGrids = null;
-        BattleEngine battleScript = null;
-        GameObject be = GameObject.FindWithTag("GameController");
-
-        if (be.name == "BattleEngine")
-        {
-            battleScript = be.GetComponent<BattleEngine>();
-            boardingGrids = battleScript.boardableGrids;
-        }
-        else
-        {
-            boardingGrids = new List<Grid>();
-        }
-
         // Call the real method from here
-        return GetAllPathsFromTile(tile, boardingGrids, range, passThrough);
+        return GetAllPathsFromTile(tile, BattleEngine.Instance.GetBoardingGrids(), range, passThrough);
     }
 
     // --------------------------------------------------------------

@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 
 //Main controller for the battle system
 //Note that this system must be activated and will not perform any logic until it is
-public class BattleEngine : MonoBehaviour 
- {
+public class BattleEngine : MonoBehaviour
+{
+    public static BattleEngine Instance; //Static reference to BattleEngine created on Start
     //Morale vars
     public const string MoraleBuffID = "morale_buff";
     public const string MoraleDebuffID = "morale_debuff";
@@ -89,10 +89,13 @@ public class BattleEngine : MonoBehaviour
     private EnemyAIController AIController;
 
     // Start is called before the first frame update
-    void Start() 
+    void Start()
     {
+        // Set static reference
+        Instance = this;
+        
         // Setup AI Controller
-        AIController = new EnemyAIController(this);
+        AIController = new EnemyAIController();
 
         // Temporary assignment of ships, crews should be passed in somewhere since they're permanent
         playerCrew.GetComponent<Crew>().ship = playerShip.GetComponent<Ship>();

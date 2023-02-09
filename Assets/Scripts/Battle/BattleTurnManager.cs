@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class BattleTurnManager : MonoBehaviour
 {
     // Public vars
-    public BattleEngine battleScript; // Battle engine ref
     public GameObject icon; // Icon game object to attach to canvas
     public uint iconCount; // Number of icons to display from the turn order
     //public uint iconMaxLookahead; // Maximum number to look ahead in turn order
@@ -46,8 +45,7 @@ public class BattleTurnManager : MonoBehaviour
             var iconScript = currIcon.GetComponent<CharacterIcon>();
 
             // Set icon data
-            iconScript.battleScript = battleScript;
-            iconScript.myChar = battleScript.turnQueue[i];
+            iconScript.myChar = BattleEngine.Instance.turnQueue[i];
             currIcon.GetComponent<Image>().sprite = iconScript.myChar.GetComponent<Character>().IsPlayer() ? iconScript.backgroundAlly : iconScript.backgroundEnemy;
             currIcon.transform.GetChild(0).GetComponent<Image>().sprite = iconScript.myChar.GetComponent<Character>().icon;
             iconScript.updateChar = true;

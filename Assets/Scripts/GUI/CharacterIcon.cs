@@ -6,7 +6,6 @@ using UnityEngine.Serialization;
 
 public class CharacterIcon : MonoBehaviour
 {
-    [SerializeField] public BattleEngine battleScript;
     [SerializeField] public TMP_Text turnOrderText;
     [SerializeField] public Sprite backgroundAlly, backgroundEnemy;
     public Character myChar;
@@ -40,7 +39,7 @@ public class CharacterIcon : MonoBehaviour
             GameObject myTile = myChar.myGrid.GetComponent<Grid>().GetTileAtPos(tilePos);
 
             // Select Char
-            battleScript.SelectCharacter(myTile.GetComponent<Tile>());
+            BattleEngine.Instance.SelectCharacter(myTile.GetComponent<Tile>());
         }
     }
 

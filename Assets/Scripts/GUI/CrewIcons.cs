@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class CrewIcons : MonoBehaviour
 {
     // Public vars
-    public BattleEngine battleScript; // Battle engine ref
     public GameObject icon; // Icon game object to attach to canvas
     public List<GameObject> goodIcons = new List<GameObject>(); // Good char icons list
     public List<GameObject> badIcons = new List<GameObject>(); // Bad char icons list
@@ -23,7 +22,7 @@ public class CrewIcons : MonoBehaviour
     void LateUpdate()
     {
         // Get char count from battle engine
-        int currNumOfChars = battleScript.units.Count;
+        int currNumOfChars = BattleEngine.Instance.units.Count;
 
         // Update when the # of chars in the battle system change
         if (numOfCharacters != currNumOfChars)
@@ -31,7 +30,7 @@ public class CrewIcons : MonoBehaviour
             Debug.Log("Updating crew icons...");
 
             // For every character
-            foreach (Character unit in battleScript.units)
+            foreach (Character unit in BattleEngine.Instance.units)
             {
                 bool isNewIcon = true;
 
