@@ -17,7 +17,7 @@ public class PathTreeNode
     public GameObject MyTile = null;
 
     // Tile range
-    public int TileRange;
+    public int TileRange = 0;
 
     // Self and child tiles as a list
     private List<GameObject> allTiles = null;

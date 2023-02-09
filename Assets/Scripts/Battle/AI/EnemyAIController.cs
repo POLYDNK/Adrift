@@ -80,8 +80,15 @@ public class EnemyAIController
         // Check whether the char actually needs to move before doing do
         if (sourceTile.position != targetTile.position)
         {
+            // Perform move
             currentGrid.MoveTowardsTile(sourceTile, targetTile, 
                                         false, myCharacter.mv.baseValue);
+
+            // Update after move
+            currentGrid = myCharacter.myGrid.GetComponent<Grid>();
+            battleScript.activeGrid = currentGrid;
+            battleScript.activeUnitTile = targetTile;
+            battleScript.activeUnitPos = targetTile.position;
             battleScript.Moved();
         }
 

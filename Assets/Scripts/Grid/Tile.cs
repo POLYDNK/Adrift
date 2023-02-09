@@ -30,7 +30,7 @@ public class Tile : MonoBehaviour
     public int myLayer;
 
     // Path to root
-    public PathTreeNode PathRef;
+    public PathTreeNode PathRef = null;
 
     // Experimental: heat map
     public int heatVal = 0;
