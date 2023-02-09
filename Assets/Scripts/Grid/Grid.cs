@@ -32,12 +32,15 @@ public class Grid : MonoBehaviour
     [SerializeField] public int gridNum; // Grid number 
     [SerializeField] public int tilesize; // Size of each tile
     [SerializeField] public int gridLayer; // Layer used for camera culling
+    [SerializeField] public bool onShip; // Whether this grid belongs to a ship
 
     // Grid vars
     [FormerlySerializedAs("Tile")] public GameObject tile; // A cell or tile that makes up the grid
     public GameObject [,] Tiles; // The actual grid, represented by a 2d array
     private uint availableTiles;
     public uint height, width;
+    public Ship ship;
+    public ShipController shipController;
 
     // Things used for click detection
     private Camera cam;
@@ -53,6 +56,13 @@ public class Grid : MonoBehaviour
     // Awake is called before Start()
     void Awake()
     {
+        // Get ship vars
+        if (onShip)
+        {
+            ship = GetComponentInParent<Ship>();
+            shipController = GetComponentInParent<ShipController>();
+        }
+        
         // Generate the grid by instantiating tile objects
         GenerateGrid(gridNum);
 
@@ -126,6 +136,9 @@ public class Grid : MonoBehaviour
 
         // Tiles valid for spawning characters
         availableTiles = width*height;
+
+        // Fix tiles not aligning with rotation, not sure why this is happening
+        transform.localRotation *= transform.localRotation;
     }
     
     // --------------------------------------------------------------

@@ -35,10 +35,26 @@ public class Tile : MonoBehaviour
     // Experimental: heat map
     public int heatVal = 0;
 
-    public float GetWorldManhattanDistance(GameObject target)
+    public float GetWorldManhattanDistance(Tile target)
     {
-        return Mathf.Abs(transform.position.x - target.transform.position.x)
-               + Mathf.Abs(transform.position.y - target.transform.position.y)
-               + Mathf.Abs(transform.position.z - target.transform.position.z);
+        Vector3 pos = GetWorldPosition();
+        Vector3 targetPos = target.GetWorldPosition();
+        return Mathf.Abs(pos.x - targetPos.x)
+               + Mathf.Abs(pos.y - targetPos.y)
+               + Mathf.Abs(pos.z - targetPos.z);
+    }
+
+    public Vector3 GetWorldPosition()
+    {
+        Vector3 pos;
+        if (grid.onShip)
+        {
+            Quaternion shipRotation = grid.shipController.transform.localRotation;
+            grid.shipController.transform.localRotation = Quaternion.identity;
+            pos = transform.position;
+            grid.shipController.transform.localRotation = shipRotation;
+        }
+        else pos = transform.position;
+        return pos;
     }
 }

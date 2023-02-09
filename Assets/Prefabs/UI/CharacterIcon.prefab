@@ -438,7 +438,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e09a4363b0c39945961216b75cbcced, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  battleScript: {fileID: 0}
   turnOrderText: {fileID: 377960018778271122}
   backgroundAlly: {fileID: 21300000, guid: c8e092c70d2a19640b590e93752f589b, type: 3}
   backgroundEnemy: {fileID: 21300000, guid: 2fc94d3a9abf21d43b1522cf95869e0a, type: 3}

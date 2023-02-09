@@ -6,30 +6,30 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 
-//Main controller for the battle system
-//Note that this system must be activated and will not perform any logic until it is
+// Main controller for the battle system
+// Note that this system must be activated and will not perform any logic until it is
 public class BattleEngine : MonoBehaviour
 {
-    public static BattleEngine Instance; //Static reference to BattleEngine created on Start
-    //Morale vars
+    public static BattleEngine Instance; // Static reference to BattleEngine created on Start
+    
+    // Morale vars
     public const string MoraleBuffID = "morale_buff";
     public const string MoraleDebuffID = "morale_debuff";
     public const int MoraleHigh = 75;
     public const int MoraleLow = 25;
-
-    public static readonly StatModifier[] MoraleBuffs = {
+    public static readonly StatModifier[] MORALE_BUFFS = {
         new(StatType.Str, OpType.Multiply, -1, 0.2f, 1f, MoraleBuffID),
         new(StatType.Def, OpType.Multiply, -1, 0.2f, 1f, MoraleBuffID),
         new(StatType.Spd, OpType.Multiply, -1, 0.2f, 1f, MoraleBuffID),
         new(StatType.Dex, OpType.Multiply, -1, 0.2f, 1f, MoraleBuffID)
     };
-    public static readonly StatModifier[] MoraleDebuffs = {
+    public static readonly StatModifier[] MORALE_DEBUFFS = {
         new(StatType.Str, OpType.Multiply, -1, -0.2f, 1f, MoraleDebuffID),
         new(StatType.Def, OpType.Multiply, -1, -0.2f, 1f, MoraleDebuffID),
         new(StatType.Spd, OpType.Multiply, -1, -0.2f, 1f, MoraleDebuffID),
         new(StatType.Dex, OpType.Multiply, -1, -0.2f, 1f, MoraleDebuffID)
     };
-    //Prefabs
+    
     public GameObject buttonPrefab;
 
     public List<Grid> boardableGrids = new(); //Grids that can be boarded via movement, automatically adds ships
@@ -39,7 +39,6 @@ public class BattleEngine : MonoBehaviour
     public bool active = false; //Activation flag to be set by other systems
     public bool interactable = true; //Flag used for locking actions during events
     public bool surrendered = false, victory = false, defeat = false; //End of battle flags
-
     public bool moving = false; //Whether the current mode is moving or acting
     private Ability selectedAbility;
     public bool init = false;
@@ -78,14 +77,13 @@ public class BattleEngine : MonoBehaviour
     private bool charHighlighted = false;
     private Vector2Int selectedCharPos;
     private Vector2Int highlightedCharPos;
-    private int lastXDist, lastYDist; //Last distance between user and target for ability selection
 
     //Hashes
     private static readonly int Hovered = Animator.StringToHash("hovered");
     private static readonly int Selected = Animator.StringToHash("selected");
     private static readonly int Interactable = Animator.StringToHash("interactable");
 
-    // AI Variables (NEW)
+    // AI Variables
     private EnemyAIController AIController;
 
     // Start is called before the first frame update
@@ -310,8 +308,6 @@ public class BattleEngine : MonoBehaviour
                                 }*/
                             }
                         }
-                        lastXDist = xDist;
-                        lastYDist = yDist;
                     }
                 }
                 if(!mouseOnGrid) {
@@ -446,7 +442,7 @@ public class BattleEngine : MonoBehaviour
         {
             foreach (Tile tile in grid.GetAllTiles())
             {
-                if (tile.passable && tile.GetWorldManhattanDistance(activeUnitTile.gameObject) <= range + 0.1F)
+                if (tile.passable && tile.GetWorldManhattanDistance(activeUnitTile) <= range + 0.1F) // Slight increase to account for rounding errors
                 {
                     tile.highlighted = true;
                     tile.GetComponent<Renderer>().material = IsTileActive(tile.grid, tile.position) ? tile.grid.activeHighlighted : tile.grid.abilityHighlighted;
@@ -750,9 +746,8 @@ public class BattleEngine : MonoBehaviour
         // Calculate manhattan distance.
         int xDist = Mathf.RoundToInt(activeUnitTile.transform.position.x - tile.transform.position.x);
         int yDist = Mathf.RoundToInt(activeUnitTile.transform.position.z - tile.transform.position.z);
-        float dist = tile.GetWorldManhattanDistance(activeUnitTile.gameObject);
-
-        /*
+        float dist = tile.GetWorldManhattanDistance(activeUnitTile);
+        
         // Test whether calculated distance exceeds ability range
         if(dist > selectedAbility.range + 0.1F)
         {
@@ -763,7 +758,6 @@ public class BattleEngine : MonoBehaviour
                 + " tiles.");
             return false;
         }
-        */
 
         if(selectedAbility.requiresTarget) 
         { 
@@ -835,7 +829,7 @@ public class BattleEngine : MonoBehaviour
             button.interactable = false;
             button.gameObject.GetComponentInChildren<TMPro.TextMeshProUGUI>().color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
         }
-        if(!IsTileActive(tile.grid, tile.position)) yield return new WaitWhile(() => !activeUnit.RotateTowards(activeGrid.GetTileAtPos(tilePos).transform.position)); //Wait for rotation first
+        if(!IsTileActive(tile.grid, tile.position)) yield return new WaitWhile(() => !activeUnit.RotateTowards(tile.grid.GetTileAtPos(tilePos).transform.position)); //Wait for rotation first
 
         //Pull and knockback
         if(selectedAbility.knockback != 0)
@@ -1039,13 +1033,13 @@ public class BattleEngine : MonoBehaviour
         if(crew.morale >= MoraleHigh) {
             if(lastMorale <= MoraleLow) crew.ClearModifiersWithId(MoraleDebuffID);
             else if(lastMorale < MoraleHigh) {
-                foreach(StatModifier modifier in MoraleBuffs) crew.AddModifier(modifier);
+                foreach(StatModifier modifier in MORALE_BUFFS) crew.AddModifier(modifier);
             }
         }
         else if(crew.morale <= MoraleLow) {
             if(lastMorale <= MoraleHigh) crew.ClearModifiersWithId(MoraleBuffID);
             else if(lastMorale > MoraleLow) {
-                foreach(StatModifier modifier in MoraleDebuffs) crew.AddModifier(modifier);
+                foreach(StatModifier modifier in MORALE_DEBUFFS) crew.AddModifier(modifier);
             }
         }
         else {
