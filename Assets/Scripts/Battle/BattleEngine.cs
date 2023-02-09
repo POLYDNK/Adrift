@@ -279,7 +279,9 @@ public class BattleEngine : MonoBehaviour
                                 }
                             }
                             else if(!moving && !acted) { //Acting
-                                if(charHighlighted && highlightedCharPos != tilePos && selectedAbility != null) {
+                                if(selectedAbility == null) ResetAllHighlights();
+                                else HighlightActionTiles(tileScript, selectedAbility.range);
+                                /*if(charHighlighted && highlightedCharPos != tilePos && selectedAbility != null) {
                                     foreach(GameObject selTile in activeGrid.GetAllTiles()) {
                                         var selPos = selTile.GetComponent<Tile>().position;
                                         if(selPos != activeUnitPos && selTile.GetComponent<Tile>().passable) selTile.GetComponent<Renderer>().material = IsTileActive(activeGrid, selPos) ? activeGrid.activeUnselected : (Mathf.Abs(activeUnitPos.x - selPos.x) + Mathf.Abs(activeUnitPos.y - selPos.y) > selectedAbility.range ? activeGrid.unselected : activeGrid.abilityHighlighted);
@@ -302,7 +304,7 @@ public class BattleEngine : MonoBehaviour
                                             }
                                         }
                                     }
-                                }
+                                }*/
                             }
                         }
                         lastXDist = xDist;
@@ -313,13 +315,6 @@ public class BattleEngine : MonoBehaviour
                     if (charHighlighted)
                     {
                         if(moving) highlightedGrid.Tiles[highlightedCharPos.x, highlightedCharPos.y].GetComponent<Renderer>().material = IsTileActive(highlightedGrid, highlightedCharPos) ? activeGrid.activeUnselected : activeGrid.unselected;
-                        /*else if(selectedAbility != null) {
-                            foreach(Vector2Int pos in selectedAbility.getRelativeShape(lastXDist, lastYDist)) {
-                                var selPos = new Vector2Int(highlightedCharPos.x + pos.x, highlightedCharPos.y + pos.y);
-                                var selTile = activeGrid.GetTileAtPos(selPos);
-                                if(selTile != null && selTile.GetComponent<TileScript>().passable) activeGrid.grid[selPos.x, selPos.y].GetComponent<Renderer>().material = isTileActive(selPos) ? activeGrid.activeUnselected : (Mathf.Abs(activeUnitPos.x - selPos.x) + Mathf.Abs(activeUnitPos.y - selPos.y) > selectedAbility.range ? activeGrid.unselected : activeGrid.abilityHighlighted);
-                            }
-                        }*/
                         charHighlighted = false;
                     }
                 }
@@ -442,8 +437,9 @@ public class BattleEngine : MonoBehaviour
     }
 
     // Highlights available action tiles for abilities
-    public void HighlightActionTiles(Vector2Int pos, int range) {
+    public void HighlightActionTiles(Tile highlightedTile, int range) {
         ResetAllHighlights();
+        Vector2Int pos = activeUnitPos;
         for(int x = Mathf.Max(pos.x - range, 0); x <= pos.x + range; x++) {
             for(int y = Mathf.Max(pos.y - range, 0); y <= pos.y + range; y++) {
                 if(Mathf.Abs(x - pos.x) + Mathf.Abs(y - pos.y) <= range) {
@@ -455,6 +451,26 @@ public class BattleEngine : MonoBehaviour
                         tileScript.highlighted = true;
                         tile.GetComponent<Renderer>().material = IsTileActive(activeGrid, tilePos) ? activeGrid.activeHighlighted : activeGrid.abilityHighlighted;
                     }
+                }
+            }
+        }
+        if(!highlightedTile.highlighted) return;
+        Vector2Int highlightPos = highlightedTile.position;
+        int xDist = activeUnitPos.x - highlightPos.x;
+        int yDist = activeUnitPos.y - highlightPos.y;
+        foreach(Vector2Int offset in selectedAbility.GetRelativeShape(xDist, yDist)) {
+            var selPos = new Vector2Int(highlightPos.x + offset.x, highlightPos.y + offset.y);
+            var selTile = highlightedTile.grid.GetTileAtPos(selPos);
+            if(selTile != null) {
+                var selTileScript = selTile.GetComponent<Tile>();
+                if(selTileScript.passable && selTileScript.characterOn != activeUnit.gameObject) {
+                    if(offset.x == 0 && offset.y == 0) {
+                        highlightedCharPos = selPos;
+                        highlightedGrid = highlightedTile.grid;
+                        charHighlighted = true;
+                    }
+                    selTileScript.highlighted = true;
+                    selTile.GetComponent<Renderer>().material = activeGrid.ability;
                 }
             }
         }
@@ -662,18 +678,12 @@ public class BattleEngine : MonoBehaviour
     {
         var selectRend  = tile.gameObject.GetComponent<Renderer>();
         Vector2Int tilePos = tile.position;
-
-        // Unselect currently selected character
-        if(charSelected) {
-            Debug.Log("Unselecting character on " + selectedCharPos.x + " " + selectedCharPos.y);
-            selectedGrid.Tiles[selectedCharPos.x, selectedCharPos.y].GetComponent<Renderer>().material = IsTileActive(selectedGrid, selectedCharPos) ? selectedGrid.activeUnselected : selectedGrid.unselected;
-        }
-
+        
         ResetAllHighlights();
 
         if (isAction)
         {
-            if(!acted) { HighlightActionTiles(tilePos, selectedAbility.range); }
+            if(!acted) { HighlightActionTiles(tile, selectedAbility.range); }
         }
         else
         {
@@ -840,7 +850,7 @@ public class BattleEngine : MonoBehaviour
             selectedCharPos = newPos;
         }
         ResetAllHighlights();
-        if(!acted) HighlightActionTiles(newPos, selectedAbility.range);
+        if(!acted) HighlightActionTiles(activeUnitTile, selectedAbility.range);
         for(int i = 0; i < selectedAbility.totalHits; i++)
         {
             selectedAbility.AffectCharacters(activeUnit, characters, i);
@@ -908,7 +918,6 @@ public class BattleEngine : MonoBehaviour
     {
         yield return new WaitWhile(() => !user.RotateTowards(target.GetTileObject().transform.position)); //Wait for rotation first
         GetComboAttack(user).AffectCharacter(user, target, 0);
-        yield break;
     }
 
     //Try to move the unit to the specified position on the grid. Returns true if move succeeds. Will not affect game state if simulate is true.
@@ -954,7 +963,6 @@ public class BattleEngine : MonoBehaviour
         }
         foreach(Character unit in aliveUnits) unit.ShowBars();
         LogicUpdate();
-        yield break;
     }
 
     // --------------------------------------------------------------

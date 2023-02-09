@@ -482,6 +482,7 @@ public class Grid : MonoBehaviour
                     Character charScript = charToMove.GetComponent<Character>();
                     charScript.gridPosition = destTile.position;
                     charScript.myGrid = destTile.grid.gameObject;
+                    charScript.transform.SetParent(charScript.myGrid.transform.parent.transform, true);
 
                     moveSuccess = true;
                 }
@@ -636,12 +637,6 @@ public class Grid : MonoBehaviour
         root.MyTile = tileObject;
         root.TileRange = range;
 
-        // Character should always be here, but just in case
-        //if(!startTile.hasCharacter) {
-        //    Debug.Log("Error: cannot retrieve paths from tile since its character is null.");
-        //    return root;
-        //}
-
         bool isPlayer = false;
 
         if (startTile.characterOn != null)
@@ -668,7 +663,6 @@ public class Grid : MonoBehaviour
             var tileScript = tempNode.MyTile.GetComponent<Tile>();
 
             // Highlight tile
-            tileScript.highlighted = true;
             int nDist = 1, sDist = 1, wDist = 1, eDist = 1;
 
             // Get neighboring tiles
@@ -676,6 +670,8 @@ public class Grid : MonoBehaviour
             GameObject downTile = tileScript.grid.GetNeighboringTile(tileScript, isPlayer, passThrough, tempNode.TileRange, Direction.SOUTH, boardingGrids, ref sDist);
             GameObject leftTile = tileScript.grid.GetNeighboringTile(tileScript, isPlayer, passThrough, tempNode.TileRange, Direction.WEST, boardingGrids, ref wDist);
             GameObject rightTile = tileScript.grid.GetNeighboringTile(tileScript, isPlayer, passThrough, tempNode.TileRange, Direction.EAST, boardingGrids, ref eDist);
+            
+            tileScript.highlighted = true;
         
             // Add neighboring tiles to queue if in range
             if (tempNode.TileRange > 0)
@@ -712,9 +708,10 @@ public class Grid : MonoBehaviour
     // Get neighboring tile with consideration for boarding grids
     private GameObject GetNeighboringTile(Tile startTile, bool isPlayer, bool passThrough, int range, Direction direction, List<Grid> boardingGrids, ref int distance)
     {
+        if (startTile.highlighted) return null;
         GameObject destTile = GetTileInDirection(startTile.position, direction);
         if (destTile != null) return destTile; // Inside bounds of current grid
-        float minDist = float.MaxValue;
+        float minDistSqr = float.MaxValue;
         // At an edge, search for valid boarding tiles
         foreach(Grid grid in boardingGrids)
         {
@@ -726,16 +723,16 @@ public class Grid : MonoBehaviour
                     if ((x > 0 && x < grid.width - 1) && (y > 0 && y < grid.height - 1)) continue; // Not at edge
                     GameObject tile = grid.GetTileAtPos(new Vector2Int(x, y));
                     if (!ValidHighlightTile(tile, isPlayer, passThrough)) continue; // Unit must be able to move
-                    float dist = DataUtil.DistanceSqr(startTile.transform.position, tile.transform.position);
-                    if (dist < minDist && dist <= range * range) // Use the closest valid tile
+                    float distSqr = DataUtil.DistanceSqr(startTile.transform.position, tile.transform.position);
+                    if (distSqr < minDistSqr && distSqr <= range * range) // Use the closest valid tile
                     {
-                        minDist = dist;
+                        minDistSqr = distSqr;
                         destTile = tile;
                     }
                 }
             }
         }
-        if(destTile != null) distance = Mathf.FloorToInt(Mathf.Sqrt(minDist));
+        if(destTile != null) distance = Mathf.FloorToInt(Mathf.Sqrt(minDistSqr));
         return destTile;
     }
 
