@@ -11,11 +11,11 @@ public static class HeatmapGenerator
     private static Tile activeTile;
     private static Tile bestTile;
     private static int highScore;
-    private static float timer;
+    //private static float timer;
 
     public static void GenerateHeatmap(List<Character> allUnits, Character activeUnit)
     {
-        timer = Time.time;
+        //timer = Time.time;
         Debug.Log("GenerateHeatmap: Generating heatmap...");
 
         // Reset
@@ -50,7 +50,7 @@ public static class HeatmapGenerator
         // Generate cannon heat
         CannonHeat(100);
 
-        Debug.Log("GenerateHeatmap: Heatmap generated (time elapsed: " + (Time.time-timer).ToString() + "s)");
+        //Debug.Log("GenerateHeatmap: Heatmap generated (time elapsed: " + (Time.time-timer).ToString() + "s)");
     }
 
     // Reset the heat value of all tiles to 0

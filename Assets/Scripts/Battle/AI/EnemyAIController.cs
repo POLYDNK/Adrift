@@ -18,7 +18,7 @@ public class EnemyAIController
     private Grid currentGrid;
     private GameObject currentTile;
     private List<ValidTarget> validTargets = null;
-    private float timer;
+    //private float timer;
 
     // --------------------------------------------------------------
     // @desc: Default constructor
@@ -176,7 +176,7 @@ public class EnemyAIController
         ValidTarget targetToReturn = null;
 
         // Time logging
-        timer = Time.time;
+        //timer = Time.time;
         Debug.Log("SelectAbilityAndTarget: Looking for best target...");
 
         // Get valid targets
@@ -216,7 +216,7 @@ public class EnemyAIController
             Debug.Log("Cannot find any valid targets! (retuning null)");
         }
 
-        Debug.Log("SelectAbilityAndTarget: Completed target search (time elapsed: " + (Time.time-timer).ToString() + "s)");
+        //Debug.Log("SelectAbilityAndTarget: Completed target search (time elapsed: " + (Time.time-timer).ToString() + "s)");
 
         return targetToReturn;
     }

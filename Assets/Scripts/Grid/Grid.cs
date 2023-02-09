@@ -442,7 +442,6 @@ public class Grid : MonoBehaviour
             // Right now this is achieved by making the max range huge, but it's not efficient)
             sourceTile.PathRef = GetAllPathsFromTile(sourceTile.gameObject, maxRange+100);
 
-
             // Get character on source tile
             if (sourceTile.hasCharacter && !destTile.hasCharacter && destTile.passable)
             {
@@ -597,7 +596,6 @@ public class Grid : MonoBehaviour
 
     public PathTreeNode GetAllPathsFromTile(GameObject tile, int range, bool passThrough = false)
     {
-        /*
         // Attempt to get boarding grids from the battle engine
         List<Grid> boardingGrids = null;
         BattleEngine battleScript = null;
@@ -612,10 +610,9 @@ public class Grid : MonoBehaviour
         {
             boardingGrids = new List<Grid>();
         }
-        */
 
         // Call the real method from here
-        return GetAllPathsFromTile(tile, new List<Grid>(), range, passThrough);
+        return GetAllPathsFromTile(tile, boardingGrids, range, passThrough);
     }
 
     // --------------------------------------------------------------
