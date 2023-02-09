@@ -749,6 +749,7 @@ public class BattleEngine : MonoBehaviour
         int yDist = Mathf.RoundToInt(activeUnitTile.transform.position.z - tile.transform.position.z);
         float dist = tile.GetWorldManhattanDistance(activeUnitTile.gameObject);
 
+        /*
         // Test whether calculated distance exceeds ability range
         if(dist > selectedAbility.range + 0.1F)
         {
@@ -759,6 +760,7 @@ public class BattleEngine : MonoBehaviour
                 + " tiles.");
             return false;
         }
+        */
 
         if(selectedAbility.requiresTarget) 
         { 

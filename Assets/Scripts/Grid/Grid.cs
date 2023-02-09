@@ -436,63 +436,70 @@ public class Grid : MonoBehaviour
         Vector2Int destPos = destTile.position;
 
         // Check whether tiles are in range
-        if (TilePosInRange(sourcePos) && TilePosInRange(destPos))
+        if (TilePosInRange(sourcePos) && destTile.grid.TilePosInRange(destPos))
         {
             // Make a new path tree (Warning: we must reach the destination tile for this to work.
             // Right now this is achieved by making the max range huge, but it's not efficient)
-            sourceTile.PathRef = GetAllPathsFromTile(sourceTile.gameObject, maxRange+100);
+            sourceTile.PathRef = GetAllPathsFromTile(sourceTile.gameObject, maxRange+200);
 
-            // Get character on source tile
-            if (sourceTile.hasCharacter && !destTile.hasCharacter && destTile.passable)
+            if (destTile.PathRef != null)
             {
-                // Only move to highlighted tiles
-                if (!onlyHighlighted || destTile.highlighted)
+                // Get character on source tile
+                if (sourceTile.hasCharacter && !destTile.hasCharacter && destTile.passable)
                 {
-                    Debug.Log("Moving character to tile " + destPos.x + " " + destPos.y);
-                    charToMove = sourceTile.characterOn;
-
-                    // Get a list of tiles towards the destination
-                    List<PathTreeNode> pathTowardsDest = destTile.PathRef.PathToRootList();
-
-                    // Cut down stack to max range
-                    while (pathTowardsDest.Count-1 > maxRange || destTile.hasCharacter)
+                    // Only move to highlighted tiles
+                    if (!onlyHighlighted || destTile.highlighted)
                     {
-                        pathTowardsDest.RemoveAt(0);
+                        Debug.Log("Moving character to tile " + destPos.x + " " + destPos.y);
+                        charToMove = sourceTile.characterOn;
 
-                        // Destination tile is the first element in the list
-                        destTile = pathTowardsDest[0].MyTile.GetComponent<Tile>();
+                        // Get a list of tiles towards the destination
+                        List<PathTreeNode> pathTowardsDest = destTile.PathRef.PathToRootList();
+
+                        // Cut down stack to max range
+                        while (pathTowardsDest.Count > maxRange || destTile.hasCharacter)
+                        {
+                            pathTowardsDest.RemoveAt(0);
+
+                            // Destination tile is the first element in the list
+                            destTile = pathTowardsDest[0].MyTile.GetComponent<Tile>();
+                        }
+                        
+                        // Move character to the new destination, instead
+                        destTile.PathRef.PathToRootOnStack(charToMove.GetComponent<FollowPath>().PathToFollow);
+
+                        // Set camera to follow moving character
+                        cam.GetComponent<CameraController>().SetCameraFollow(charToMove);
+
+                        // Set source tile data
+                        sourceTile.hasCharacter = false;
+                        sourceTile.characterOn = null;
+
+                        // Set destination tile data
+                        destTile.hasCharacter = true;
+                        destTile.characterOn = charToMove;
+
+                        // Update character data
+                        Character charScript = charToMove.GetComponent<Character>();
+                        charScript.gridPosition = destTile.position;
+                        charScript.myGrid = destTile.grid.gameObject;
+                        charScript.transform.SetParent(charScript.myGrid.transform.parent.transform, true);
+
+                        moveSuccess = true;
                     }
-                    
-                    // Move character to the new destination, instead
-                    destTile.PathRef.PathToRootOnStack(charToMove.GetComponent<FollowPath>().PathToFollow);
-
-                    // Set camera to follow moving character
-                    cam.GetComponent<CameraController>().SetCameraFollow(charToMove);
-
-                    // Set source tile data
-                    sourceTile.hasCharacter = false;
-                    sourceTile.characterOn = null;
-
-                    // Set destination tile data
-                    destTile.hasCharacter = true;
-                    destTile.characterOn = charToMove;
-
-                    // Update character data
-                    Character charScript = charToMove.GetComponent<Character>();
-                    charScript.gridPosition = destTile.position;
-                    charScript.myGrid = destTile.grid.gameObject;
-                    charScript.transform.SetParent(charScript.myGrid.transform.parent.transform, true);
-
-                    moveSuccess = true;
+                    else
+                    {
+                        Debug.Log("MoveTowardsTile: Error! cannot move to unhighlighted tiles");
+                    }
                 }
                 else
                 {
-                    Debug.Log("MoveTowardsTile: Error! cannot move to unhighlighted tiles");
+                    Debug.Log("MoveTowardsTile: Error! source tile does not have a character");
                 }
             }
             else
             {
-                Debug.Log("MoveTowardsTile: Error! source tile does not have a character");
+                Debug.Log("MoveTowardsTile: Error! no path reference for destination tile");
             }
         }
         else
