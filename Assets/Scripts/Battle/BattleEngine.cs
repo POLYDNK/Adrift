@@ -752,6 +752,7 @@ public class BattleEngine : MonoBehaviour
         // Calculate manhattan distance.
         int xDist = activeCharScript.gridPosition.x - tilePos.x;
         int yDist = activeCharScript.gridPosition.y - tilePos.y;
+        /*
         int dist = Mathf.Abs(xDist) + Mathf.Abs(yDist);
 
         // Test whether calculated distance exceeds ability range
@@ -764,6 +765,7 @@ public class BattleEngine : MonoBehaviour
                 + " tiles.");
             return false;
         }
+        */
 
         if(selectedAbility.requiresTarget) 
         { 
