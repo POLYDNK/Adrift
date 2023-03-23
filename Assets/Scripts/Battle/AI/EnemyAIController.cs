@@ -1,6 +1,7 @@
 /// @author: Bryson Squibb
 /// @date: 01/22/2023
 /// @description: this script controls the behavior of an NPC.
+/// lez was here
 
 using System.Collections;
 using System.Collections.Generic;
